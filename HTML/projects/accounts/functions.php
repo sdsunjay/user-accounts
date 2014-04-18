@@ -50,9 +50,10 @@ function checkbrute($user_id,$mysql) {
 
                // If there have been more than 4 failed logins 
                if ($timez->num_rows > 4) {
-                  //mysqli_stmt_close($timez);
+                  timez->close();
                   return true;
                } else {
+                  timez->close();
                   //mysqli_stmt_close($timez);
                   return false;
                }
@@ -204,10 +205,13 @@ function checkEmail($mysqli,$email)
          // A user with this email address already exists
          $message = "A user with this email already exists!"; 
          $_SESSION['Error'] = $message;
+         $stmt->close();
          return false;
       }
+         $stmt->close();
       return true;
    }
+         $stmt->close();
    return false;
 }
 function checkUsername($mysqli,$username)
@@ -225,10 +229,13 @@ function checkUsername($mysqli,$username)
          // A user with this email address already exists
          $message = "A user with this username already exists!"; 
          $_SESSION['Error'] = $message;
+         $stmt->close();
          return false;
       }
+         $stmt->close();
       return true;
    }
+         $stmt->close();
    return false;
 }
 function registerUser($username,$email,$password,$password1)
@@ -258,39 +265,138 @@ function registerUser($username,$email,$password,$password1)
             if ($insert_user = $mysqli->prepare("INSERT INTO login (username, email, password) VALUES (?, ?, ?)")) {
                $insert_user->bind_param('sss', $username, $email, $temp_pass);
                // Execute the prepared query.
-               if (! $insert_user->execute()) {
-                  $message = "Registration failure: INSERT";
-                  $_SESSION['Error'] = $message;
-                  header('Location: ./register.php');
+               if ($insert_user->execute()) {
+                 insert_user->close(); 
+                  $_SESSION['user_name'] = $name;
+                  $_SESSION['user']=1;
+                  $_SESSION['user_is_logged_in'] = true; 
+                 mysqli->close(); 
+                  return true;
                }
                else
                {
-                  $_SESSION['user_name'] = $name;
-                  $_SESSION['user']=1;
-                  $_SESSION['user_is_logged_in'] = true;         
-                  header('Location: ./protected_page.php');
+                 insert_user->close(); 
+                  $message = "Registration failure: INSERT";
+                  $_SESSION['Error'] = $message;
+                 mysqli->close(); 
+                  return false;
+
                }
             }
             else {
+                 insert_user->close(); 
                $message = "Database error";
                $_SESSION['Error'] = $message;
-               header('Location: ./register.php');
+                 mysqli->close(); 
+                  return false;
             }
          }
          else
          {
-            header('Location: ./register.php');
+                 mysqli->close(); 
+                  return false;
          }
       }
       else
       {
-         header('Location: ./register.php');
+                 mysqli->close(); 
+                  return false;
       }
    }
    else
    {
       $_SESSION['Error'] = $feedback;
-      header('Location: ./register.php');
+                 mysqli->close(); 
+                  return false;
    }
+}
+function getID($mysqli,$username)
+   {
+
+      $chk_name= $mysqli->prepare("SELECT id FROM login WHERE username = ?");
+      $chk_name->bind_param('s',$username);
+      // Execute the prepared query.
+      if ($chk_name->execute()) {
+         /* bind result variables */
+         $chk_name->bind_result($uid);
+         $output=$chk_name->fetch();
+         if($output)
+         {
+            chk_name->close();
+            return $output;
+         }
+            chk_name->close();
+      }
+      return 0;
+   }
+function insertQuestionsAnswers($question1,$question2,$answer1,$answer2,$username)
+{
+
+   $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+   /* check connection */
+   if (mysqli_connect_errno()) 
+   {
+      $message = "Connect failed";
+      $_SESSION['Error'] = $message;
+      mysqli->close();
+      return FALSE;
+   }
+   $id=getID($mysqli,$username);
+   if($id>0)
+   {
+      //two questions and two answers
+      if(insertQuestion($mysqli,$id,$question1,$answer1))
+      {
+         if(insertQuestion($mysqli,$id,$question2,$answer2))
+         {
+            mysqli->close();
+            return TRUE;
+         }
+         else
+         {
+
+            $message = "question 2 could not be added";
+            $_SESSION['Error'] = $message;
+         }
+      }
+      else
+      {
+
+         $message = "question 1 could not be added";
+         $_SESSION['Error'] = $message;
+      }
+
+   }
+   else
+   {
+
+      $message = "Username could not be found";
+      $_SESSION['Error'] = $message;
+   }
+   mysqli->close();
+   return FALSE;
+}
+function insertQuestion($mysqli,$uid,$question,$answer)
+{
+
+   if ($insert_user = $mysqli->prepare("INSERT INTO questionsanswers (id,questionID,answerID) VALUES (?, ?,?)")) {
+      $insert_user->bind_param('iis', $uid, $question, $answer);
+      // Execute the prepared query.
+      if (! $insert_user->execute()) {
+         $message = "Registration failure: INSERT";
+         $_SESSION['Error'] = $message;
+         insert_user->close();
+      }
+      else
+      {
+         insert_user->close();
+         return true; 
+      }
+   }
+   else {
+      $message = "Database error";
+      $_SESSION['Error'] = $message;
+   }
+   return false;
 }
 ?>

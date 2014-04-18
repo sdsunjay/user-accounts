@@ -61,9 +61,15 @@ function login($username, $password,$mysqli) {
             if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id, time) VALUES (?, ?)")) {
                $insert_st->bind_param('is', $uid, $now);
                // Execute the prepared query.
-               if (! $insert_st->execute()) {
+               if ($insert_st->execute()) {
+                  insert_st->close();
+                  return false;
+               }
+               else
+               {
                   $message = "Registration failure: INSERT";
                   $_SESSION['Error']=$message;
+                  insert_st->close();
                   return false;
                }
 
@@ -104,17 +110,18 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
 
    if(is_null($name))
    {
-      //echo "name is null in sign in";
+      echo "name is null in sign in";
       printf("Name is null\n\n");
    }
    else if(is_null($password))
    {
-      //echo "pass is null in sign in";
+      echo "pass is null in sign in";
       printf("pass is null\n\n");
    }
    else
    {
       $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+      //this needs to be fixed..use the class..I will merge with it..eventually.
       $name = preg_replace("/[^a-zA-Z0-9_\-]+/","",$name);
       $name= $mysqli->escape_string($name);
 
@@ -136,15 +143,19 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
          // Sets the session name to the one set above.
          session_name($session_name);
          $mysqli->close();
-         header('Location: ./protected_page.php');
+         echo "Yes";
       }
       else
       {
 
          // Login fail 
-         header('Location: ./index.php');  
          $mysqli->close();
+         echo "No";
       }
    }
+}
+else
+{
+   echo "Enter username and password";
 }
 ?>
