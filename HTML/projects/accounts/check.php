@@ -3,7 +3,7 @@ include_once("../../config/db_config.php");
 include_once 'functions.php';
  
 sec_session_start(); // Our custom secure way of starting a PHP session.
- 
+
 //from login username field
 // from login password field
 function login($username, $password,$mysqli) {
@@ -16,16 +16,17 @@ function login($username, $password,$mysqli) {
       /* bind result variables */
       $chk_name->bind_result($uid,$hash);
       $output=$chk_name->fetch();
-      
-      //must remove last character, I have no idea why?
-     $hash=substr($hash, 0, -1);
-     mysqli_stmt_close($chk_name);
+
+      //username does not exist in table
        if($output==null)
       {
-         $message = "output is null"; 
-         $_SESSION['Error']=$message;
+         $_SESSION['Error']="Username and password combination is incorrect.";
+         return false;
          //echo "<script type='text/javascript'>alert('$message');</script>";
       }
+     $chk_name->close();
+      //must remove last character, I have no idea why?
+     $hash=substr($hash, 0, -1);
     /* if ( strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES') == 0)
       {
          echo "TRUE hash cmp";
@@ -62,14 +63,14 @@ function login($username, $password,$mysqli) {
                $insert_st->bind_param('is', $uid, $now);
                // Execute the prepared query.
                if ($insert_st->execute()) {
-                  insert_st->close();
+                  $insert_st->close();
                   return false;
                }
                else
                {
                   $message = "Registration failure: INSERT";
                   $_SESSION['Error']=$message;
-                  insert_st->close();
+                  $insert_st->close();
                   return false;
                }
 

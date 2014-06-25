@@ -23,6 +23,8 @@
 <?php 
 include_once 'functions.php';
 sec_session_start(); // Our custom secure way of starting a PHP session.
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
 if( isset($_SESSION['Error']) )
 {
    echo $_SESSION['Error'];

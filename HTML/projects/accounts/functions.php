@@ -1,6 +1,10 @@
 <?php
 
+require_once '../../security/htmlpurifier/library/HTMLPurifier.auto.php';
+    $config = HTMLPurifier_Config::createDefault();
+    $purifier = new HTMLPurifier($config);
 //sec_session_start();
+
 function esc_url($url) {
  
     if ('' == $url) {
@@ -31,6 +35,8 @@ function esc_url($url) {
         return $url;
     }
 }
+
+ //There is a problem with this function
 function checkbrute($user_id,$mysql) {
 
     // Get timestamp of current time 
@@ -50,11 +56,11 @@ function checkbrute($user_id,$mysql) {
 
                // If there have been more than 4 failed logins 
                if ($timez->num_rows > 4) {
-                  timez->close();
+                  //the below line causes the page not to work, not sure why..
+                  $timez->close();
                   return true;
                } else {
-                  timez->close();
-                  //mysqli_stmt_close($timez);
+                  $timez->close();
                   return false;
                }
             }
@@ -65,6 +71,7 @@ function checkbrute($user_id,$mysql) {
          }
     return false;
 }
+
 function login_check($mysqli) {
    // Check if all session variables are set 
    if (isset($_SESSION['user_id'], 
@@ -94,9 +101,11 @@ function login_check($mysqli) {
 
                if ($login_check == $login_string) {
                   // Logged In!!!! 
+               $stmt->close();
                   return true;
                } else {
                   // Not logged in 
+               $stmt->close();
                   return false;
                }
             } else {
@@ -112,7 +121,6 @@ function login_check($mysqli) {
          return false;
       }
 }
-
 
 function sec_session_start() {
    $session_name = 'sec_session_id';   // Set a custom session name
@@ -148,17 +156,18 @@ function logout()
  * Validates the user's registration input
  * @return bool Success status of user's registration data validation
  */
+
 function checkRegistrationData($username,$email,$pass,$pass1 )
 {
    global $feedback;
    // validating the input
    if (!empty($username)
-      && strlen($username) <= 64
-         && strlen($username) >= 2
-         && preg_match('/^[a-z\d]{2,64}$/i', $username)
-            && !empty($email)
-               && strlen($email) <= 64
-               && filter_var($email, FILTER_VALIDATE_EMAIL)
+      && (strlen($username) <= 64)
+         && (strlen($username) >= 2)
+         && (preg_match('/^[a-z\d]{2,64}$/i', $username))
+            && (!empty($email))
+               && (strlen($email) <= 64)
+                  && filter_var($email, FILTER_VALIDATE_EMAIL)
                   && !empty($pass)
                      && !empty($pass1)
                         && ($pass === $pass1)
@@ -181,15 +190,19 @@ function checkRegistrationData($username,$email,$pass,$pass1 )
                               $feedback = "Email cannot be empty";
                            } elseif (strlen($email) > 64) {
                               $feedback = "Email cannot be longer than 64 characters";
-                           } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                           }
+                           elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                               $feedback = "Your email address is not in a valid email format";
-                           } else {
+                          }
+                           else {
                               $feedback = "An unknown error occurred.";
                            }
 
    // default return
    return false;
 }
+
+
 function checkEmail($mysqli,$email)
 {
 
@@ -205,13 +218,13 @@ function checkEmail($mysqli,$email)
          // A user with this email address already exists
          $message = "A user with this email already exists!"; 
          $_SESSION['Error'] = $message;
-         $stmt->close();
+        $stmt->close();
          return false;
       }
-         $stmt->close();
+      $stmt->close();
       return true;
    }
-         $stmt->close();
+   $stmt->close();
    return false;
 }
 function checkUsername($mysqli,$username)
@@ -232,20 +245,22 @@ function checkUsername($mysqli,$username)
          $stmt->close();
          return false;
       }
-         $stmt->close();
+      $stmt->close();
       return true;
    }
-         $stmt->close();
    return false;
 }
 function registerUser($username,$email,$password,$password1)
 {
 
+
+    $username = $purifier->purify($username);
+    $email = $purifier->purify($email);
    if(checkRegistrationData($username,$email,$password,$password1))
    {
 
       $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-      /* check connection */
+      // check connection 
       if (mysqli_connect_errno()) 
       {
          $message = "Connect failed";
@@ -266,47 +281,47 @@ function registerUser($username,$email,$password,$password1)
                $insert_user->bind_param('sss', $username, $email, $temp_pass);
                // Execute the prepared query.
                if ($insert_user->execute()) {
-                 insert_user->close(); 
+                 $insert_user->close(); 
                   $_SESSION['user_name'] = $name;
                   $_SESSION['user']=1;
                   $_SESSION['user_is_logged_in'] = true; 
-                 mysqli->close(); 
+                 $mysqli->close(); 
                   return true;
                }
                else
                {
-                 insert_user->close(); 
+               $insert_user->close(); 
                   $message = "Registration failure: INSERT";
                   $_SESSION['Error'] = $message;
-                 mysqli->close(); 
+                 $mysqli->close(); 
                   return false;
 
                }
             }
             else {
-                 insert_user->close(); 
+               $insert_user->close(); 
                $message = "Database error";
                $_SESSION['Error'] = $message;
-                 mysqli->close(); 
+                 $mysqli->close(); 
                   return false;
             }
          }
          else
          {
-                 mysqli->close(); 
+        $mysqli->close(); 
                   return false;
          }
       }
       else
       {
-                 mysqli->close(); 
+         $mysqli->close(); 
                   return false;
       }
    }
    else
    {
       $_SESSION['Error'] = $feedback;
-                 mysqli->close(); 
+      $mysqli->close(); 
                   return false;
    }
 }
@@ -317,15 +332,15 @@ function getID($mysqli,$username)
       $chk_name->bind_param('s',$username);
       // Execute the prepared query.
       if ($chk_name->execute()) {
-         /* bind result variables */
+         //bind result variables
          $chk_name->bind_result($uid);
          $output=$chk_name->fetch();
          if($output)
          {
-            chk_name->close();
+            $chk_name->close();
             return $output;
          }
-            chk_name->close();
+            $chk_name->close();
       }
       return 0;
    }
@@ -333,12 +348,12 @@ function insertQuestionsAnswers($question1,$question2,$answer1,$answer2,$usernam
 {
 
    $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-   /* check connection */
+   // check connection 
    if (mysqli_connect_errno()) 
    {
       $message = "Connect failed";
       $_SESSION['Error'] = $message;
-      mysqli->close();
+     $mysqli->close();
       return FALSE;
    }
    $id=getID($mysqli,$username);
@@ -349,7 +364,7 @@ function insertQuestionsAnswers($question1,$question2,$answer1,$answer2,$usernam
       {
          if(insertQuestion($mysqli,$id,$question2,$answer2))
          {
-            mysqli->close();
+            $mysqli->close();
             return TRUE;
          }
          else
@@ -373,7 +388,7 @@ function insertQuestionsAnswers($question1,$question2,$answer1,$answer2,$usernam
       $message = "Username could not be found";
       $_SESSION['Error'] = $message;
    }
-   mysqli->close();
+   $mysqli->close();
    return FALSE;
 }
 function insertQuestion($mysqli,$uid,$question,$answer)
@@ -385,11 +400,10 @@ function insertQuestion($mysqli,$uid,$question,$answer)
       if (! $insert_user->execute()) {
          $message = "Registration failure: INSERT";
          $_SESSION['Error'] = $message;
-         insert_user->close();
+         $insert_user->close();
       }
       else
       {
-         insert_user->close();
          return true; 
       }
    }
