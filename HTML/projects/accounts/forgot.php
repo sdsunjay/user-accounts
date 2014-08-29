@@ -2,7 +2,7 @@
 <html>
    <head>
       <title>Forgot Password</title>
-   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
    </script>
     <!--  <link rel="stylesheet" type="text/css" href="style.css">-->
    </head>
@@ -66,7 +66,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                      else if(result === "No")
                      {
                         alert('Username does not exist');
-                        // window.location = "http://google.com";
+                        // window.location = "https://google.com";
                         //window.location = "index.php";
                      }
                      else

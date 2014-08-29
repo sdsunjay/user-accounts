@@ -50,6 +50,7 @@ function login($username, $password,$mysqli) {
       }*/
       if(checkbrute($uid,$mysqli) == false)
       {
+        $_SESSION['user_id']=$uid;
          //there have not been more than 5 failed login attempts
          if (password_verify($password,$hash)) {
             /* Valid */
@@ -111,34 +112,38 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
 
    if(is_null($name))
    {
-      echo "name is null in sign in";
-      printf("Name is null\n\n");
+      $message = "Name is null";
+      $_SESSION['Error']=$message;
    }
    else if(is_null($password))
    {
-      echo "pass is null in sign in";
-      printf("pass is null\n\n");
+      $message = "Password is null";
+      $_SESSION['Error']=$message;
    }
    else
    {
       $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-      //this needs to be fixed..use the class..I will merge with it..eventually.
       $name = preg_replace("/[^a-zA-Z0-9_\-]+/","",$name);
       $name= $mysqli->escape_string($name);
+
+      //purifier broken
+      //using html purifier
+      //$name = $purifier->purify($name);
 
       /* check connection */
       if (mysqli_connect_errno()) 
       {
-         printf("Connect failed: %s\n", mysqli_connect_error());
-         echo "Connect: failed";
-         exit();
+         $message = "Connect: failed";
+         $_SESSION['Error']=$message;
+         echo "No";
       }
-      if(login($name,$password,$mysqli))
+      
+      else if(login($name,$password,$mysqli))
       {
          // Login success 
          $_SESSION['user_name'] = $name;
          $_SESSION['user_is_logged_in'] = true;         
-         $_SESSION['user']=1;
+        // $_SESSION['user']=1;
          $session_name = 'sec_session_id';   // Set a custom session name
          
          // Sets the session name to the one set above.
@@ -151,12 +156,16 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
 
          // Login fail 
          $mysqli->close();
+         $_SESSION['user_is_logged_in'] = false;         
          echo "No";
       }
    }
 }
 else
 {
-   echo "Enter username and password";
+      $message = "Enter username and password";
+      $_SESSION['Error']=$message;
+      echo "No";
+   //echo "Enter username and password";
 }
 ?>

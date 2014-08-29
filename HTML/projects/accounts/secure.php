@@ -1,7 +1,7 @@
 **
  * Helps to properly escape variables for different output types.
  *
- * @see http://www.janoszen.com/2012/04/16/proper-xss-protection-in-javascript-php-and-smarty/
+ * @see https://www.janoszen.com/2012/04/16/proper-xss-protection-in-javascript-php-and-smarty/
  */
 class EscapeHelper {
     /**

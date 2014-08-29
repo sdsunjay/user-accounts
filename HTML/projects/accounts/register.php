@@ -1,6 +1,7 @@
 
 <?php
 
+global $feedback;
 include_once("../../config/db_config.php");
 include_once("functions.php");
 
@@ -25,10 +26,19 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'], $_POST['passw
    $answer2 = filter_input(INPUT_POST, 'answer2', FILTER_SANITIZE_STRING);
    $question1 = $_POST['question1'];
    $question2 = $_POST['question2'];
+   
    if(registerUser($username,$email,$password,$password1))
    {
       if(insertQuestionsAnswers($question1,$question2,$answer1,$answer2,$username))
       {
+         // Login success 
+         $_SESSION['user_name'] = $username;
+         $_SESSION['user_is_logged_in'] = true;         
+        // $_SESSION['user']=1;
+         $session_name = 'sec_session_id';   // Set a custom session name
+         
+         // Sets the session name to the one set above.
+         session_name($session_name);
          echo "Yes";
       }
       else

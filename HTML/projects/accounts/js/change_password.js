@@ -1,11 +1,12 @@
-$(document).on('click', '#submit', function() { // catch the form's submit event
-   if($('#username').val().length > 0 && $('#password').val().length > 0){
+$(document).on('click', '#button', function() { // catch the form's submit event
+
+
       // Send data to server through ajax call
       // action is functionality we want to call and outputJSON is our data
       $.ajax({
-         url: "check.php",
+         url: "change_password.php",
          data: {
-         action : 'login', 
+         action : 'change_passowrd', 
          username: $("#username").val(),
          password: $("#password").val(),
          submit:true
@@ -60,8 +61,4 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
           }
        }
       });                   
-   } else {
-      alert('Please fill all nececery fields');
-   }           
-   return false; // cancel original event to prevent form submitting
-});         
+}
