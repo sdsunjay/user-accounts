@@ -1,37 +1,66 @@
-$(document).on('click', '#button', function() { // catch the form's submit event
-
-
-      // Send data to server through ajax call
-      // action is functionality we want to call and outputJSON is our data
+function verifyPassword(password, password1)
+{
+ var matches = password.match(/\d+/g);
+ if (matches != null) {
+      if (password.length > 9 ){
+         if (password.length < 129){
+            if (password.localeCompare(password1) == 0)
+            {
+               return true;
+            }
+            else
+            {
+               message="Passwords do not match.";
+               //passwords do not match
+            }
+         }
+         else
+         {
+            message="Password must be 128 characters or less.";
+            //password is too long
+         }
+      }
+      else
+      {
+         message="Password must be 10 characters or greater.";
+         //password is too short
+      }
+   }
+   else
+   {
+      message="Password must contain at least one digit.";
+   }
+   return false;
+}
+var message;
+$(document).on('click', '#submit', function() { // catch the form's submit event
+ if(verifyPassword(($("#new_password").val()),$("#new_password1").val()))
+   {
       $.ajax({
          url: "change_password.php",
          data: {
-         action : 'change_passowrd', 
-         username: $("#username").val(),
-         password: $("#password").val(),
+         action : 'change_password', 
+         old_password: $("#old_password").val(),
+         new_password: $("#new_password").val(),
+         new_password1: $("#new_password1").val(),
          submit:true
-         }, //send username and password and submit to check.php
+         }, 
          type: "POST",                   
          beforeSend: function() {
-            //Not sure what to do here..
-            // This callback function will trigger before data is sent
-            // $.mobile.showPageLoadingMsg(true); // This will show ajax spinner
          },
             complete: function() {
-            //Not sure what to do here..
-               // This callback function will trigger on data sent/received complete
-               //$.mobile.hidePageLoadingMsg(); // This will hide ajax spinner
          },
          success: function (result) {
 
             if (result === "Yes")
             {
-               window.location = "protected_page.php";
+               alert("success");
+               window.location='#';
             }
             else if(result === "No")
             {
-               // window.location = "https://google.com";
-               window.location = "index.php";
+               alert("No");
+               window.location='#';
             }
             else
             {
@@ -39,10 +68,7 @@ $(document).on('click', '#button', function() { // catch the form's submit event
                //window.location = "error.php";
             }
          },
-         /*error: function (request,error) {
                // This callback function will trigger on unsuccessful action                
-               alert('Network error has occurred please try again!');
-               }*/
          error: function(jqXHR, exception) {
           if (jqXHR.status === 0) {
              alert('Not connect.\n Verify Network.');
@@ -59,6 +85,11 @@ $(document).on('click', '#button', function() { // catch the form's submit event
           } else {
              alert('Uncaught Error.\n' + jqXHR.responseText);
           }
-       }
+         }
       });                   
-}
+   }
+   else
+   {
+      alert(message);
+   }
+});

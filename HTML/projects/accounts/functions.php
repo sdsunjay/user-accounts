@@ -75,8 +75,8 @@ function checkbrute($user_id,$mysql) {
             {
                $timez->store_result();
 
-               // If there have been more than 4 failed logins 
-               if ($timez->num_rows > 4) {
+               // If there have been more than 3 failed logins 
+               if ($timez->num_rows > 3) {
                   //the below line causes the page not to work, not sure why..
                   $timez->close();
                   return true;
@@ -119,7 +119,8 @@ function login_check($mysqli) {
 
                //if ($login_check == $login_string) {
                   // Logged In!!!! 
-               $stmt->close();
+          /* close statement */
+             mysqli_stmt_close($stmt);
                   return true;
               // } else {
                   // Not logged in 
@@ -127,6 +128,7 @@ function login_check($mysqli) {
                 //  return false;
               // }
             } else {
+             mysqli_stmt_close($stmt);
                // Not logged in 
                return false;
             }
@@ -176,51 +178,60 @@ function logout()
  * @return bool Success status of user's registration data validation
  */
 
-function checkRegistrationData($username,$email,$pass,$pass1 )
+function checkRegistrationData($username,$pass,$pass1)
 {
    // validating the input
    if (!empty($username)
       && (strlen($username) <= 64)
          && (strlen($username) >= 2)
-         && (preg_match('/^[a-z\d]{2,64}$/i', $username))
-            && (!empty($email))
-               && (strlen($email) <= 64)
-                  && filter_var($email, FILTER_VALIDATE_EMAIL)
-                  && !empty($pass)
-                     && !empty($pass1)
-                        && (strcmp($pass,$pass1) == 0 )
-                           && (strlen($pass) < 255)
-                              && ( strlen($pass1) < 255)
-                           ) {
-                              // only this case return true, only this case is valid
-                              return true;
-                           } elseif (empty($username)) {
-                              $feedback = "Empty Username";
-                           } elseif (empty($pass) || empty($pass1)) {
-                              $feedback = "Empty Password";
-                           } elseif (strcmp($pass,$pass1) == 0) {
-                              $feedback = "Password and password confirmation are not the same";
-                           } elseif (strlen($pass) < 6) {
-                              $feedback = "Password has a minimum length of 6 characters";
-                           } elseif (strlen($username) > 64 || strlen($username) < 2) {
-                              $feedback = "Username cannot be shorter than 2 or longer than 64 characters";
-                           } elseif (!preg_match('/^[a-z\d]{2,64}$/i', $username)) {
-                              $feedback = "Username does not fit the name scheme: only a-Z and numbers are allowed, 2 to 64 characters";
-                           } elseif (empty($email)) {
-                              $feedback = "Email cannot be empty";
-                           } elseif (strlen($email) > 64) {
-                              $feedback = "Email cannot be longer than 64 characters";
-                           } elseif (strlen($pass) > 254) {
-                              $feedback = "Password cannot be longer than 254 characters";
-                           } elseif (strlen($pass1) > 254) {
-                              $feedback = "Password cannot be longer than 254 characters";
-                           }
-                           elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                              $feedback = "Your email address is not in a valid email format";
-                          }
-                           else {
-                              $feedback = "An unknown error occurred.";
-                           }
+            && (preg_match('/^[a-z\d]{2,64}$/i', $username))
+         //      && (!empty($email))
+          //        && (strlen($email) <= 64)
+           //          && filter_var($email, FILTER_VALIDATE_EMAIL)
+                        && !empty($pass)
+                           && !empty($pass1)
+                              &&  (preg_match("(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$)",$pass))
+                                 && (strcmp($pass,$pass1) == 0 )
+                                    && (strlen($pass) < 128)
+                                       && ( strlen($pass1) < 128)
+                                          ) {
+                                             // only this case return true, only this case is valid
+                                             return true;
+                                          } 
+                                          else if(!preg_match("(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$)",$pass))
+                                          {
+                                             $feedback = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
+                                          }
+                                          else if (empty($username)) {
+                                             $feedback = "Empty Username";
+                                          } else if (empty($pass) || empty($pass1)) {
+                                             $feedback = "Empty Password";
+                                          } else if(strcmp($pass,$pass1) == 0) {
+                                             $feedback = "Password and password confirmation are not the same";
+                                          } else if (strlen($pass) < 10) {
+                                             $feedback = "Password has a minimum length of 10 characters";
+                                          } else if (strlen($username) > 64 || strlen($username) < 2) {
+                                             $feedback = "Username cannot be shorter than 2 or longer than 64 characters";
+                                          } elseif (!preg_match('/^[a-z\d]{2,64}$/i', $username)) {
+                                             $feedback = "Username does not fit the name scheme: only a-Z and numbers are allowed, 2 to 64 characters";
+                                          }
+                                         /* elseif (empty($email)) {
+                                             $feedback = "Email cannot be empty";
+                                          } elseif (strlen($email) > 64) {
+                                             $feedback = "Email cannot be longer than 64 characters";
+                                          }
+                                         
+                                          elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                             $feedback = "Your email address is not in a valid email format";
+                                          }
+                                          */elseif (strlen($pass) >128) {
+                                             $feedback = "Password cannot be longer than 128 characters";
+                                          } elseif (strlen($pass1) > 128) {
+                                             $feedback = "Password cannot be longer than 128 characters";
+                                          }
+                                          else {
+                                             $feedback = "An unknown error occurred.";
+                                          }
    $_SESSION['Error']=$feedback;
    // default return
    return false;
@@ -230,28 +241,38 @@ function checkRegistrationData($username,$email,$pass,$pass1 )
 function checkEmail($mysqli,$email)
 {
 
-   $prep_stmt = "SELECT id FROM login WHERE email = ? LIMIT 1";
-   $stmt = $mysqli->prepare($prep_stmt);
+   $query = "SELECT id FROM login WHERE email = ? LIMIT 1";
+   $stmt = $mysqli->prepare($query);
 
    if ($stmt) {
       $stmt->bind_param('s', $email);
-      $stmt->execute();
-      $stmt->store_result();
+      if ($stmt->execute())
+      {
+         $stmt->store_result();
 
-      if ($stmt->num_rows == 1) {
-         // A user with this email address already exists
-         $feedback = "A user with this email already exists!"; 
-         $_SESSION['Error']=$feedback;
-        $stmt->close();
-         return false;
-      }
-         $stmt->close();
+         if ($stmt->num_rows == 1) {
+            // A user with this email address already exists
+            $feedback = "A user with this email already exists!"; 
+            $_SESSION['Error']=$feedback;
+            /* close statement */
+            mysqli_stmt_close($stmt);
+            return false;
+         }
+         /* close statement */
+         mysqli_stmt_close($stmt);
          return true;
+      }
+      $feedback = "Problem executing query";
+      $_SESSION['Error']=$feedback;
+      /* close statement */
+      mysqli_stmt_close($stmt);
+      return true;
    }
    $feedback = "A problem occurred with this email"; 
    $_SESSION['Error']=$feedback;
-   $stmt->close();
-   return false;
+   /* close statement */
+   mysqli_stmt_close($stmt);
+   return true;
 }
 
 
@@ -266,24 +287,31 @@ function checkUsernameExists($username,$mysqli)
       $chk_name->store_result();
 
       if ($chk_name->num_rows == 1) {
-         $chk_name->close();
+         /* close statement */
+         mysqli_stmt_close($chk_name);
          return true;
       }
       //this should in theory never happen..
       else if ($chk_name->num_rows >= 1) {
          $feedback = $username." exists multiple times in the database. WHAT?!"; 
          $_SESSION['Error']=$feedback;
-         $chk_name->close();
-         return false;
+         /* close statement */
+         mysqli_stmt_close($chk_name);
       }
- 
+
       else
       {
-         $chk_name->close();
-         return false;
+         /* close statement */
+         mysqli_stmt_close($chk_name);
       }
 
    }
+   else
+   {
+
+         $_SESSION['Error']='Could not execute query';
+   }
+   return false;
 }
 function checkUsername($mysqli,$username)
 {
@@ -300,10 +328,12 @@ function checkUsername($mysqli,$username)
          // A user with this email address already exists
          $feedback = "A user with this username already exists!"; 
          $_SESSION['Error']=$feedback;
-         $stmt->close();
+         /* close statement */
+         mysqli_stmt_close($stmt);
          return false;
       }
-      $stmt->close();
+         /* close statement */
+         mysqli_stmt_close($stmt);
       return true;
    }
    else
@@ -313,14 +343,90 @@ function checkUsername($mysqli,$username)
    }
    return false;
 }
+
+function registerUserFromCli($username,$password,$password1)
+{
+   $config = HTMLPurifier_Config::createDefault();
+   $purifier = new HTMLPurifier($config);
+   $username = $purifier->purify($username);
+   if(checkRegistrationData($username,$password,$password1))
+   {
+
+      $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+      // check connection 
+      if (mysqli_connect_errno()) 
+      {
+         $feedback = "Connect failed";
+         $_SESSION['Error'] = $feedback;
+         return false;
+      }
+
+      // Username validity and password validity have NOT been checked client side.
+      // This should be adequate as nobody gains any advantage from
+      // breaking these rules.
+         if(checkUsername($mysqli,$username))
+         {
+            //create a random salt
+            $random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+             
+            $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 8))."\n";
+            // Insert the new user into the database 
+            if ($insert_user = $mysqli->prepare("INSERT INTO login (username, email, password,created_at) VALUES (?, ?, ?,?)")) {
+               date_default_timezone_set('America/Los_Angeles');
+               $created_at =date("Y-m-d H:i:s");
+               $insert_user->bind_param('ssss', $username, $email, $temp_pass,$created_at);
+               // Execute the prepared query.
+               if ($insert_user->execute()) {
+                  /* close statement */
+                  mysqli_stmt_close($insert_user);
+                  $_SESSION['user_name'] = $username;
+                  $_SESSION['user_is_logged_in'] = true; 
+                  //temp fix for now
+                  $_SESSION['user_id'] = 1;
+                  /* close connection */ mysqli_close($mysqli); 
+               //  $mysqli->close(); 
+                  return true;
+               }
+               else
+               {
+                  $insert_user->close(); 
+                  $feedback = "Registration failure: INSERT";
+                  /* close connection */ mysqli_close($mysqli); 
+                  //$mysqli->close(); 
+                  $_SESSION['Error'] = $feedback;
+                  return false;
+
+               }
+            }
+            else {
+               $insert_user->close(); 
+               $feedback = "Database Error!";
+               //$mysqli->close(); 
+               /* close connection */ mysqli_close($mysqli); 
+               $_SESSION['Error'] = $feedback;
+               return false;
+            }
+         }
+         else
+         {
+            $mysqli->close(); 
+            //$_SESSION['Error'] = $feedback;
+            return false;
+         }
+   }
+   else
+   {
+      return false;
+   }
+}
 function registerUser($username,$email,$password,$password1)
 {
-    $config = HTMLPurifier_Config::createDefault();
-    $purifier = new HTMLPurifier($config);
-    $username = $purifier->purify($username);
-    $email = $purifier->purify($email);
-    if(checkRegistrationData($username,$email,$password,$password1))
-    {
+   $config = HTMLPurifier_Config::createDefault();
+   $purifier = new HTMLPurifier($config);
+   $username = $purifier->purify($username);
+   $email = $purifier->purify($email);
+   if(checkRegistrationData($username,$password,$password1))
+   {
 
       $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
       // check connection 
@@ -338,6 +444,9 @@ function registerUser($username,$email,$password,$password1)
       {
          if(checkUsername($mysqli,$username))
          {
+            //create a random salt
+            $random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+             
             $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 8))."\n";
             // Insert the new user into the database 
             if ($insert_user = $mysqli->prepare("INSERT INTO login (username, email, password,created_at) VALUES (?, ?, ?,?)")) {
@@ -346,19 +455,21 @@ function registerUser($username,$email,$password,$password1)
                $insert_user->bind_param('ssss', $username, $email, $temp_pass,$created_at);
                // Execute the prepared query.
                if ($insert_user->execute()) {
-                 $insert_user->close(); 
+                  /* close statement */
+                  mysqli_stmt_close($insert_user);
                   $_SESSION['user_name'] = $username;
                   $_SESSION['user_is_logged_in'] = true; 
                   //temp fix for now
                   $_SESSION['user_id'] = 1;
-                  $mysqli->close(); 
+                  /* close connection */ mysqli_close($mysqli); 
+               //  $mysqli->close(); 
                   return true;
                }
                else
                {
-               $insert_user->close(); 
+                  $insert_user->close(); 
                   $feedback = "Registration failure: INSERT";
-                 $mysqli->close(); 
+                  $mysqli->close(); 
                   $_SESSION['Error'] = $feedback;
                   return false;
 
@@ -367,16 +478,16 @@ function registerUser($username,$email,$password,$password1)
             else {
                $insert_user->close(); 
                $feedback = "Database Error!";
-                 $mysqli->close(); 
-                  $_SESSION['Error'] = $feedback;
-                  return false;
+               $mysqli->close(); 
+               $_SESSION['Error'] = $feedback;
+               return false;
             }
          }
          else
          {
-                  $mysqli->close(); 
-                  //$_SESSION['Error'] = $feedback;
-                  return false;
+            $mysqli->close(); 
+            //$_SESSION['Error'] = $feedback;
+            return false;
          }
       }
       else
@@ -392,38 +503,89 @@ function registerUser($username,$email,$password,$password1)
    }
 }
 
-function updatePassword($mysqli,$username,$password)
+function updatePassword($username,$old_password,$new_password,$new_password1)
 {
-   //include login function from check
-   // if login($username,$password,$mysqli)
-   // {
-   // }
-
-   //$temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 8));
-   $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 8))."\n";
-   // Insert the new user into the database 
-   //date_default_timezone_set('America/Los_Angeles');
-   //$created_at =date("Y-m-d H:i:s");
-
-   $query_string="UPDATE login SET PASSWORD = ? where username = ?";
-      $chk_name= $mysqli->prepare($query_string);
-   $chk_name->bind_param('ss',$temp_pass,$username);
-   // Execute the prepared query.
-   if ($chk_name->execute()) {
-      // bind result variables 
-      //$chk_name->bind_result($uid,$hash);
-      //$output=$chk_name->fetch();
-
-      //username does not exist in table
-      //   if($output==null)
-      //  {
-      //    $_SESSION['Error']="Username and password combination is incorrect.";
-      //   return false;
-      //echo "<script type='text/javascript'>alert('$message');</script>";
-      $chk_name->close();
-      return true;
+   if(is_null($username))
+   {
+      $message = "Username is null";
    }
-   $chk_name->close();
+   elseif(is_null($old_password))
+   {
+      $message = "Old password is null";
+   }
+   elseif(is_null($new_password))
+   {
+      $message = "New password is null";
+   }
+   elseif(is_null($new_password1))
+   {
+      $message = "New password is null";
+   }
+   elseif(strcmp($new_password,$new_password1) == 0 )
+   {
+      if(strlen($new_password) >= 10)
+      {
+         $result = (preg_match('/[A-Z]+/', $new_password) && preg_match('/[a-z]+/', $new_password) && preg_match('/\d/', $new_password));
+         if ($result)
+         {
+            $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+            // check connection 
+            if (mysqli_connect_errno()) 
+            {
+               $message = "Connect failed";
+            }
+            //is the username valid?
+            else if(checkUsernameExists($username,$mysqli))
+            {
+               //are they already logged in?
+               if(login_check($mysqli))
+               {
+                  //are they who they say they are?
+                  if (login($username,$old_password,$mysqli))
+                  {
+                     $temp_pass=password_hash($new_password, PASSWORD_BCRYPT,array("cost" => 8))."\n";
+                     date_default_timezone_set('America/Los_Angeles');
+                     $query_string="UPDATE login SET PASSWORD = ? where username = ?";
+                     $stmt= $mysqli->prepare($query_string);
+                     $stmt->bind_param('ss',$temp_pass,$username);
+                     // Execute the prepared query.
+                     if ($stmt->execute()) {
+                        $stmt->close();
+                        return true;
+                     }
+                     $stmt->close();
+                  }
+                  else
+                  {
+                     $message = "username and password combination is incorrect.";
+                  }
+               }
+               else
+               {
+                  $message = "You are not logged in";
+               }
+            }
+            else
+            {
+               $message = $username . "does NOT exist.";
+            }
+         }
+         else
+         {
+            $message = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
+         }
+      }
+      else
+      {
+         $message = "Password length must be 10 or more characters.";
+
+      }
+   }
+   else
+   {
+      $message = "Passwords do not match.";
+   }
+   $_SESSION['Error'] = $message;
    return false;
 }
 function getID($mysqli,$username)
@@ -522,5 +684,98 @@ function insertQuestion($mysqli,$uid,$question,$answer)
       $_SESSION['Error'] = $feedback;
    }
    return false;
+}
+/**
+ * Used to autheticate user when logging in
+ */
+
+function login($username, $password,$mysqli) {
+
+
+   $chk_name= $mysqli->prepare("SELECT id,password FROM login WHERE username = ?");
+   $chk_name->bind_param('s',$username);
+   // Execute the prepared query.
+   if ($chk_name->execute()) {
+      /* bind result variables */
+      $chk_name->bind_result($uid,$hash);
+      $output=$chk_name->fetch();
+
+      //username does not exist in table
+      if($output==null)
+      {
+         $_SESSION['Error']="Username and password combination is incorrect.";
+         return false;
+         //echo "<script type='text/javascript'>alert('$message');</script>";
+      }
+      $chk_name->close();
+      //must remove last character, I have no idea why?
+      $hash=substr($hash, 0, -1);
+    /* if ( strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES') == 0)
+      {
+         echo "TRUE hash cmp";
+      }
+      else
+      {
+      echo 'hash: ';
+      echo strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES');
+      }
+      if (strcmp($password,'SD972eff*') == 0)
+      {
+         echo "TRUE password cmp\n";
+      }
+      else
+      {
+         echo 'password: ';
+         echo strcmp($password,'SD972eff*');
+      }
+      if (password_verify('SD972eff*','$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES')) {
+        echo "true verify hash and password\n";
+    }*/
+      if(checkbrute($uid,$mysqli) == false)
+      {
+         $_SESSION['user_id']=$uid;
+         //there have not been more than 5 failed login attempts
+         if (password_verify($password,$hash)) {
+            /* Valid */
+            return true;
+         }
+         else
+         {
+            // Invalid 
+            $now = time();
+            if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id, time) VALUES (?, ?)")) {
+               $insert_st->bind_param('is', $uid, $now);
+               // Execute the prepared query.
+               if ($insert_st->execute()) {
+                  $insert_st->close();
+                  return false;
+               }
+               else
+               {
+                  $message = "Login Attempts failure: INSERT";
+                  $_SESSION['Error']=$message;
+                  $insert_st->close();
+                  return false;
+               }
+
+
+            }
+            $_SESSION['Error']="Username and password combination is incorrect.";
+            return false;
+         }
+      }
+      else
+      {
+         $_SESSION['Error']="Account is temporarily locked.";
+         return false;
+      } 
+
+   }
+   else
+   {
+      $_SESSION['Error']="Unable to execute query.";
+      return false;
+   }
+
 }
 ?>

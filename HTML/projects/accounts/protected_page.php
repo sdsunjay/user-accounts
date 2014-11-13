@@ -8,15 +8,48 @@
 <link rel="stylesheet" type="text/css" href="../../gui/style.css" />
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
 <script type="text/javascript" src="../../gui/jquery.formerize-0.1.js"></script>
-<script language="javascript" type="text/JavaScript" src="../accounts/js/login.js"></script>
+
+        <script src="../../js/jquery.lightbox_me.js" type="text/javascript" charset="utf-8"></script>
+<!--<script language="javascript" type="text/JavaScript" src="../accounts/js/login.js"></script>-->
       <link rel="stylesheet" type="text/css" href="style.css">
 <script type="text/javascript">
-	$(function() {
-		$('#search').formerize();
-	});
+$(function() {
+   $('#search').formerize();
+        });
 </script>
 
+<script type="text/javascript" charset="utf-8">
+$(function() {
+   function launch() {
+      $('#sign_up').lightbox_me({centered: true, onLoad: function() { $('#sign_up').find('input:first').focus()}});
+            }
+            $('#try-1').click(function(e) {
+               $("#sign_up").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+                  $("#sign_up").find("input:first").focus();
+                                }});
+                e.preventDefault();
+            });
+            $('table tr:nth-child(even)').addClass('stripe');
+        });
+    </script>
 
+<script type="text/javascript" charset="utf-8">
+$(function() {
+   function launch() {
+      $('#upload').lightbox_me({centered: true, onLoad: function() { $('#upload').find('input:first').focus()}});
+            }
+            $('#upload_button').click(function(e) {
+               $("#upload").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+                  $("#upload").find("input:first").focus();
+                                }});
+                e.preventDefault();
+            });
+            $('table tr:nth-child(even)').addClass('stripe');
+        });
+    </script>
+   <script language="javascript" type="text/JavaScript" src="js/change_password.js"></script>
+
+   <script type ="text/javascript" src="../../bitcoin/coin.js"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -31,7 +64,7 @@
       </div>
     </form>
   </div>
- 	<div id="menu">
+        <div id="menu">
                         <ul>
                              <li class="https://sunjaydhama.com"><a href="../../gui/index.html">Home</a></li>
                              <li><a href="../../gui/about.html">About</a></li>
@@ -40,23 +73,23 @@
                              <li><a href="../../gui/projects.html">Projects</a></li>
                              <li><a href="../../gui/contact.html">Contact Me</a></li>
                         </ul>
-			<br class="clearfix" />
-		</div>
-	</div>
-	<div id="page">
-		<div id="sidebar">
-			<h3>Sidebar</h3>
-			<ul class="list">
+                        <br class="clearfix" />
+                </div>
+        </div>
+        <div id="page">
+                <div id="sidebar">
+                        <h3>Sidebar</h3>
+                        <ul class="list">
                          <li class="first"><a href="https://sunjaydhama.com">Terminal</a></li>
                          <li><a href="#" onClick="window.open('https://github.com/sdsunjay?tab=repositories', 'external');">Github</a></li>
-                      
+
       <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/sdsunjay" data-widget-id="459207762094735360">Tweets by @sdsunjay</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^https:/.test(d.location)?'https':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
   </ul>
 </div>
 <div id="content">
 <div id="post1">
-<button name = "change" type="button"  text="Change Password">Change Password</button>
+<!--<button name = "change" type="button"  text="Change Password">Change Password</button>-->
 <?php
 include_once("../../config/db_config.php");
 include("../accounts/functions.php");
@@ -71,9 +104,9 @@ function user_role($mysqli,$username)
       /* bind result variables */
       $chk_name->bind_result($uid);
       $output=$chk_name->fetch();
-      
+
       //must remove last character, I have no idea why?
-     mysqli_stmt_close($chk_name);
+      mysqli_stmt_close($chk_name);
    }
 
    $chk_name= $mysqli->prepare("SELECT role_id FROM user_roles WHERE user_id = ?");
@@ -83,9 +116,9 @@ function user_role($mysqli,$username)
       /* bind result variables */
       $chk_name->bind_result($role_id);
       $output=$chk_name->fetch();
-      
+
       //must remove last character, I have no idea why?
-     mysqli_stmt_close($chk_name);
+      mysqli_stmt_close($chk_name);
    }
    $chk_name= $mysqli->prepare("SELECT role FROM roles WHERE id = ?");
    $chk_name->bind_param('i',$role_id);
@@ -94,9 +127,9 @@ function user_role($mysqli,$username)
       /* bind result variables */
       $chk_name->bind_result($role);
       $output=$chk_name->fetch();
-      
+
       //must remove last character, I have no idea why?
-     mysqli_stmt_close($chk_name);
+      mysqli_stmt_close($chk_name);
    }
    if(strcmp($role,"admin") == 0)
    {
@@ -117,38 +150,82 @@ function showInfo($mysqli)
       /* bind result variables */
       $chk_name->bind_result($name);
       while($chk_name->fetch()){
-             echo $name . '<br />';
+         echo $name . '<br />';
       }
       $chk_name->free_result();
       mysqli_stmt_close($chk_name);
    }
 }
 //if(session_id() == '' || !isset($_SESSION)) {
-   // session isn't started
+// session isn't started
 //   session_start();            // Start the PHP session 
 //   session_regenerate_id();    // regenerated the session, delete the old one. 
 //}
 
-  
-   $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-   /* check connection */
-   if (mysqli_connect_errno()) 
-   {
-      printf("Connect failed: %s\n", mysqli_connect_error());
-      echo "Connect: failed";
-      exit();
-   }
+
+$mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+/* check connection */
+if (mysqli_connect_errno()) 
+{
+   printf("Connect failed: %s\n", mysqli_connect_error());
+   echo "Connect: failed";
+   exit();
+}
 /*check to make sure we are logged in*/
 if(login_check($mysqli))
 {
    echo "Welcome " .$_SESSION['user_name']."<br>";
+?>
+                    <a href="#" id="try-1" class="try sprited">Change Your Password</a>
+            <div id="sign_up">
+               <h3>Update Password</h3>
+               <p>
+               Passwords must be at least 10 characters long
+               <br>
+               Passwords must contain:
+               <br>
+               At least one upper case letter (A..Z)
+               <br>
+               At least one lower case letter (a..z)
+               <br>
+               At least one number (0..9)</p>
+               <div id="sign_up_form">
+                  <label><input type="password" id="old_password" name="old_password" size="64" placeholder="Old Password" class="sprited" autocomplete="off"/></label>
+                  <label><input type="password" id="new_password" name="new_password" size="64" placeholder="New Password" class="sprited" autocomplete="off"/></label>
+                  <label><input type="password" id="new_password1" name="new_password1" size="64" placeholder="Confirm Password" class="sprited" autocomplete="off"/></label>
+                  <div id="actions">
+                     <a class="close form_button sprited" id="cancel" href="#">Cancel</a>
+                     <input id="submit" type="submit" name="submit" value="Update" onclick="window.location='./protected_page.php';" />
+               </div>
+               </div>
+   </div>
+<br>
+<!-- IN PROGRESS -->
+
+                <a href="#" id="upload_button" class="upload_class sprited">Upload a Picture</a>
+            <div id="upload">
+               <h3>Upload a Picture</h3>
+               <p>Only .JPG images less than 1MB </p>
+                  <form action="upload/upload_file.php" method="post"
+                     enctype="multipart/form-data">
+                     <label for="file">Filename:</label>
+                     <input type="file" name="file" id="file"><br>
+                     <input type="submit" name="submit" value="Submit">
+                  </form>
+                  <div id="actions">
+                     <a class="close form_button sprited" id="cancel" href="#">Cancel</a>
+               </div>
+               </div>
+   </div>
+<?php   
    if(user_role($mysqli,$_SESSION['user_name']))
    {
-      echo "<h3><a href='../airport/admin.php'>Airport Admin</a></h3>";
+      //echo "<h3><a href='../airport/admin.php'>Airport Admin</a></h3>";
       //echo "You are an administrator <br>";i
       echo "<h3> Users </h3>";
+
       showInfo($mysqli);
-   
+
       //show all tables
    }
    else
@@ -158,7 +235,7 @@ if(login_check($mysqli))
    }
    echo "You are securely logged in. <br>"; 
    echo "If you are done, please <a href='logout.php'>Log Out</a>.";
-   
+
 }
 else
 {
@@ -175,14 +252,29 @@ else
 </div>
 </div>
 </div>
-                  <div id="footer"> Copyright (c) 2014 <a href="https://www.sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
-<a class='facebook' href='#' onclick="window.open('https://www.linkedin.com/in/sdsunjay','external');" >
-                        <img alt='' src='../../gui/images/li.png' width="30" height="30" /></a>
-                     <a class='twitter' href='#' onclick="window.open('https://www.twitter.com/sdsunjay','external');" >
-                        <br>
-                        <img alt='' src='../../gui/images/twitt.jpg' width="30" height="30"/></a>
-                     <br>
-                     <a href="https://bitcoin.org" target="_NEW">BitCoin</a>: <b><a href="bitcoin:1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx">1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx</a></b><br />
-                  </div>
-               </body>
-            </html>
+      <div id="footer"> Copyright (c) 2014 <a href="https://www.sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
+         <a class='facebook' href='#' onclick="window.open('https://www.linkedin.com/in/sdsunjay','external');" >
+            <img alt='' src='../../gui/images/li.png' width="30" height="30" /></a>
+         <a class='twitter' href='#' onclick="window.open('https://www.twitter.com/sdsunjay','external');" >
+            <br>
+            <img alt='' src='../../gui/images/twitt.jpg' width="30" height="30"/></a>
+         <br>
+         <a href="https://bitcoin.org" target="_NEW">BitCoin</a>: <b>
+<script>
+CoinWidgetCom.go({
+   wallet_address: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
+      , currency: "bitcoin"
+      , counter: "hide"
+      , alignment: "bl"
+      , qrcode: true
+      , auto_show: false
+      , lbl_button: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
+      , lbl_address: "My Bitcoin Address:"
+      , lbl_count: "Donations"
+      , lbl_amount: "BTC"
+                                    });
+</script>
+         </b><br />
+      </div>
+   </body>
+</html>

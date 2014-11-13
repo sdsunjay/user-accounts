@@ -1,58 +1,147 @@
-<html>
-   <head>
+
+<head>
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta https-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Accounts</title>
+<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="../../gui/style.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
+<script type="text/javascript" src="../../gui/jquery.formerize-0.1.js"></script>
+<script language="javascript" type="text/JavaScript" src="../accounts/js/login.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#search').formerize();
+	});
+</script>
+
+
+<style>
+.uinput {
+	width:50px;
+	background-color:blue;
+	background:white;
+}
+#output, #output1 {
+	text-align:center;
+}
+#text {
+	display:none;
+}
+#plane {
+	width:630px;
+	height:300px;
+}
+
+</style>
+
       <meta charset="UTF-8">
       <title>Secure Login: Registration Form</title>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script language="javascript" type="text/JavaScript" src="js/register.js"></script>
 <script language="javascript" type="text/JavaScript" src="js/forms.js"></script>
-  </head>
-      <body>
-         <!-- Registration form to be output if the POST variables are not
-         set or if the registration script caused an error. -->
+   <script type ="text/javascript" src="../../bitcoin/coin.js"></script>
+</head>
+<body>
+<div id="wrapper">
+<div id="header">
+  <div id="logo">
+    <h1><strong>Register</strong></h1>
+  </div>
+ 	<div id="menu">
+                        <ul>
+                             <li class="https://sunjaydhama.com"><a href="../../gui/index.html">Home</a></li>
+                             <li><a href="../../gui/about.html">About</a></li>
+                             <li><a href="../../gui/images.html">Images</a></li>
+                             <li><a href="../../blog">Blog</a></li>
+                             <li><a href="../../gui/projects.html">Projects</a></li>
+                             <li><a href="../../gui/contact.html">Contact Me</a></li>
+                        </ul>
+			<br class="clearfix" />
+		</div>
+	</div>
+	<div id="page">
+		<div id="sidebar">
+			<h3>Sidebar</h3>
+			<ul class="list">
+                         <li class="first"><a href="https://sunjaydhama.com">Terminal</a></li>
+                         <li><a href="#" onClick="window.open('https://github.com/sdsunjay?tab=repositories', 'external');">Github</a></li>
+                      
+      <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/sdsunjay" data-widget-id="459207762094735360">Tweets by @sdsunjay</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^https:/.test(d.location)?'https':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+  </ul>
+</div>
 
-         <h1>Register</h1>
-         <ul>
-            <li>Usernames may contain only digits, upper and lower case letters and underscores</li>
-            <li>Username must be between 3 and 64 characters</li>
-            <li>Emails must have a valid email format</li>
-            <li>Passwords must be at least 6 characters long</li>
-            <li>Passwords must contain
-            <ul>
-               <li>At least one upper case letter (A..Z)</li>
-               <li>At least one lower case letter (a..z)</li>
-               <li>At least one number (0..9)</li>
-            </ul>
-            </li>
-         </ul>
-         Username <br><input type="text" id="username" name="username" size="64"><br>
-         Email <br><input type="text" id="email" name="email" size="64"><br>
-         Password <br><input type="password" id="password" name="password" size="64"><br>
-         Confirm Password <br><input type="password" id="password1" name="password1" size="64"><br>
-         Security Question 1<br>
-         <select name="question1" id="question1" >
-            <option value=1>What is your favorite actor's name?</option>
-            <option value=2>What is the name of the street you grew up on?</option>
-            <option value=3>If you could have any super power, what would it be?</option>
-            <option value=4>What is your pet's name?</option>
-            <option value=5>In what city is your vacation home located?</option>
-            <option value=6>What was the nickname of your grandfather?</option>
-            <option value=7>What was the name of your first stuffed animal?</option>
-         </select>               
-         <br>
-         Security Answer 1 <br><input type="text" id="answer1" name="answer1" size="64"><br>
-         Security Question 2<br>
-         <select name="question2" id="question2">
-            <option value=1>What is your favorite actor's name?</option>
-            <option value=2>What is the name of the street you grew up on?</option>
-            <option value=3>If you could have any super power, what would it be?</option>
-            <option value=4>What is your pet's name?</option>
-            <option value=5>In what city is your vacation home located?</option>
-            <option value=6>What was the nickname of your grandfather?</option>
-            <option value=7>What was the name of your first stuffed animal?</option>
-         </select>               
-         <br>
-         Security Answer 2 <br><input type="text" name="answer2" id="answer2"  size="64"/><br>
-         <input id="submit" type="submit" name="submit" value="Register"/> 
-         <p>Return to the <a href="index.php">login</a></p>
-      </body>
-   </html>
+<div id="content">
+
+   <table BORDER="3">
+      <tr><th>Usernames may contain only digits, upper and lower case letters and underscores</th></tr>
+      <tr> <th>Username must be between 3 and 64 characters</th></tr>
+      <tr>  <th>Emails must have a valid email format</th></tr>
+      <tr> <th>Passwords must be at least 10 characters long</th></tr>
+      <tr><th>Passwords must contain</th></tr>
+      <tr> <th>At least one upper case letter (A..Z)</th></tr>
+      <tr> <th>At least one lower case letter (a..z)</th></tr>
+      <tr> <th>At least one number (0..9)</th></tr>
+   </table>
+   <div id="post1">
+      <!-- Registration form to be output if the POST variables are not
+      set or if the registration script caused an error. -->
+      <input type="text" id="username" name="username" size="64" placeholder="Username" autocorrect=off autocapitalize=words>
+      <br><input type="text" id="email" name="email" size="64" placeholder="Email" autocorrect=off autocapitalize=words  >
+      <br><input type="password" id="password" name="password" size="64" placeholder="password" >
+      <br><input type="password" id="password1" name="password1" size="64" placeholder="Confirm Password"  >
+      <br>Security Question 1<br>
+      <select name="question1" id="question1" >
+         <option value=1>What is your favorite actor's name?</option>
+         <option value=2>What is the name of the street you grew up on?</option>
+         <option value=3>If you could have any super power, what would it be?</option>
+         <option value=4>What is your pet's name?</option>
+         <option value=5>In what city is your vacation home located?</option>
+         <option value=6>What was the nickname of your grandfather?</option>
+         <option value=7>What was the name of your first stuffed animal?</option>
+      </select>               
+      <br>
+      <input type="text" id="answer1" name="answer1" size="64" placeholder="Security Answer 1" autocorrect=off autocapitalize=words /><br>
+      Security Question 2<br>
+      <select name="question2" id="question2">
+         <option value=1>What is your favorite actor's name?</option>
+         <option value=2>What is the name of the street you grew up on?</option>
+         <option value=3>If you could have any super power, what would it be?</option>
+         <option value=4>What is your pet's name?</option>
+         <option value=5>In what city is your vacation home located?</option>
+         <option value=6>What was the nickname of your grandfather?</option>
+         <option value=7>What was the name of your first stuffed animal?</option>
+      </select>               
+      <br>
+      <input type="text" name="answer2" id="answer2"  size="64" placeholder="Security Answer 2" autocorrect=off autocapitalize=words/><br>
+      <input id="submit" type="submit" name="submit" value="Register"/> 
+      <p>Return to the <a href="index.php">login</a></p>
+   </div>
+</div>
+<div id="footer"> Copyright (c) 2014 <a href="https://www.sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
+   <a class='facebook' href='#' onclick="window.open('https://www.linkedin.com/in/sdsunjay','external');" >
+      <img alt='' src='../../gui/images/li.png' width="30" height="30" /></a>
+   <a class='twitter' href='#' onclick="window.open('https://www.twitter.com/sdsunjay','external');" >
+      <br>
+      <img alt='' src='../../gui/images/twitt.jpg' width="30" height="30"/></a>
+   <br>
+   <a href="https://bitcoin.org" target="_NEW">BitCoin</a>: <b>
+      <script>
+CoinWidgetCom.go({
+wallet_address: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
+, currency: "bitcoin"
+, counter: "hide"
+, alignment: "bl"
+, qrcode: true
+, auto_show: false
+, lbl_button: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
+, lbl_address: "My Bitcoin Address:"
+, lbl_count: "Donations"
+, lbl_amount: "BTC"
+});
+      </script>
+   </b><br />
+</div>
+</body>
+</html>
