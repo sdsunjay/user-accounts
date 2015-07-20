@@ -15,7 +15,7 @@ function formhash(form, password) {
     form.submit();
 }
  
-function regformhash(username, email, password, conf,answer1,answer2) {
+function regformhash(username, email, password, conf,answer1) {
      // Check each field has a value
     if (username.value == ''         || 
           email.value == ''     || 
@@ -86,12 +86,12 @@ function regformhash(username, email, password, conf,answer1,answer2) {
     // check that the second answer is sufficiently long (min 3 chars)
     // the check is duplicated below, but this is included to give more
     // specific guidance to the user
-    if (answer2.length < 3) {
-        alert('answers must be at least 3 characters long.  please try again');
+   // if (answer2.length < 3) {
+     //   alert('answers must be at least 3 characters long.  please try again');
         //form.password.focus();
-        document.getelementbyid("answer2").focus();
-        return false;
-    }
+     //   document.getelementbyid("answer2").focus();
+      //  return false;
+  //  }
     // Create a new element input, this will be our hashed password field. 
     //var p = document.createElement("input");
  

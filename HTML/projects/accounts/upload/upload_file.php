@@ -61,7 +61,7 @@ if($_FILES["file"]["name"])
                "/tmp/uploads/" . $_FILES["file"]["name"]);
             echo "Stored in: " . $_FILES["file"]["name"];
          }
-         header("Location: https://www.sunjaydhama.com/projects/accounts");
+         header("Location: https://www.sunjaydhama.com/projects/accounts/protected_page.php");
          die();
       }
    }

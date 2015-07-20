@@ -1,98 +1,99 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta name="description" content="" />
-<meta name="keywords" content="" />
-<meta https-equiv="content-type" content="text/html; charset=utf-8" />
-        <title>Secure Login: Protected Page</title>
-<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="../../gui/style.css" />
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
-<script type="text/javascript" src="../../gui/jquery.formerize-0.1.js"></script>
 
-        <script src="../../js/jquery.lightbox_me.js" type="text/javascript" charset="utf-8"></script>
-<!--<script language="javascript" type="text/JavaScript" src="../accounts/js/login.js"></script>-->
-      <link rel="stylesheet" type="text/css" href="style.css">
-<script type="text/javascript">
-$(function() {
-   $('#search').formerize();
-        });
-</script>
+<!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <title>User Accounts: Protected Page</title>
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-   function launch() {
-      $('#sign_up').lightbox_me({centered: true, onLoad: function() { $('#sign_up').find('input:first').focus()}});
-            }
-            $('#try-1').click(function(e) {
-               $("#sign_up").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
-                  $("#sign_up").find("input:first").focus();
-                                }});
-                e.preventDefault();
-            });
-            $('table tr:nth-child(even)').addClass('stripe');
-        });
-    </script>
+<!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+            <link rel="icon" href="https://sunjaydhama.com/images/batman.png" type="image/x-icon">
+            <link rel="shortcut icon" href="https://sunjaydhama.com/images/batman.png" type="image/x-icon">
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-   function launch() {
-      $('#upload').lightbox_me({centered: true, onLoad: function() { $('#upload').find('input:first').focus()}});
-            }
-            $('#upload_button').click(function(e) {
-               $("#upload").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
-                  $("#upload").find("input:first").focus();
-                                }});
-                e.preventDefault();
-            });
-            $('table tr:nth-child(even)').addClass('stripe');
-        });
-    </script>
-   <script language="javascript" type="text/JavaScript" src="js/change_password.js"></script>
+<!-- Meta Content
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-   <script type ="text/javascript" src="../../bitcoin/coin.js"></script>
+            <meta charset="utf-8">
+            <meta name="keywords" content="Sunjay, Dhama, Cal, Poly, California, Polytechnic, San Luis Obispo, Obispo, Software, Engineering, Computer, Science, Android, Security, C, C++, Java, Javascript, Python, CUDA, Terminal, HTML,CSS,JavaScript, PHP">
+            <meta name="description" content="User Accounts: Protected Page">
+            <meta name="author" content="Sunjay Dhama">
+            <meta content="images/batman.png" itemprop="image">
+            <meta https-equiv="content-type" content="text/html; charset=utf-8" />
+
+<!-- SEO -->
+<link rel="canonical" href="https://www.sunjaydhama.com/" />
+
+<!-- Facebook -->
+<meta property="og:image" content="https://www.sunjaydhama.com/images/selfie.jpg"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="User Accounts: Protected Page"/>
+<meta property="og:url" content="https://www.sunjaydhama.com/"/>
+<meta property="og:site_name" content="sunjaydhama.com"/>
+<meta property="og:description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California."/>
+<meta property=”og:locale” content=”en_US” />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@sdsunjay">
+<meta name="twitter:title" content="Sunjay Dhama">
+<meta name="twitter:description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California."/>
+<meta name="twitter:image:src" content="https://www.sunjaydhama.com/images/selfie.jpg">
+
+<!-- Google+ -->
+<meta itemprop="name" content="Sunjay Dhama">
+<meta itemprop="description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California.">
+<meta itemprop="image" content="https://www.sunjaydhama.com/images/selfie.jpg">
+
+<!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+
+<!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<link rel="stylesheet" href="../../css/normalize.css">
+<link rel="stylesheet" href="../../css/skeleton.css">
+<!--
+<link rel="stylesheet" type="text/css" href="css/style.css">
+-->
+
+<link rel="stylesheet" type="text/css" href="../../css/login_style.css">
 </head>
 <body>
-<div id="wrapper">
-<div id="header">
-  <div id="logo">
-    <h1><strong>Sunjay's Homepage</strong></h1>
-  </div>
-  <div id="search">
-    <form action="" method="post">
-      <div>
-        <input class="form-text" name="search" size="44" maxlength="100" title="Search my website" />
-      </div>
-    </form>
-  </div>
-        <div id="menu">
-                        <ul>
-                             <li class="https://sunjaydhama.com"><a href="../../gui/index.html">Home</a></li>
-                             <li><a href="../../gui/about.html">About</a></li>
-                             <li><a href="../../gui/images.html">Images</a></li>
-                             <li><a href="../../blog">Blog</a></li>
-                             <li><a href="../../gui/projects.html">Projects</a></li>
-                             <li><a href="../../gui/contact.html">Contact Me</a></li>
-                        </ul>
-                        <br class="clearfix" />
-                </div>
-        </div>
-        <div id="page">
-                <div id="sidebar">
-                        <h3>Sidebar</h3>
-                        <ul class="list">
-                         <li class="first"><a href="https://sunjaydhama.com">Terminal</a></li>
-                         <li><a href="#" onClick="window.open('https://github.com/sdsunjay?tab=repositories', 'external');">Github</a></li>
 
-      <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/sdsunjay" data-widget-id="459207762094735360">Tweets by @sdsunjay</a>
-      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^https:/.test(d.location)?'https':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-  </ul>
-</div>
-<div id="content">
-<div id="post1">
-<!--<button name = "change" type="button"  text="Change Password">Change Password</button>-->
+
+<!-- Nav
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<nav>
+   <ul>
+      <li><a href="../../gui/new/about.html">ABOUT</a></li>
+      <li><a href="../../gui/new/projects.html">PROJECTS</a></li>
+      <li>
+      <a href="../../gui/new/index.html">
+         <img id="navlogo" src="../../images/logo.png" alt="navagation-logo"></a></li>
+      <li><a href="../../gui/new/resume.html">R&Eacute;SUM&Eacute;</a></li>
+      <li><a href="../../gui/new/contact.html">CONTACT</a></li>
+   </ul>
+</nav>
+<!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<div class="shell">
+   <div class="contact">
+      <div class="content-contactform">
+
+
+
+
 <?php
 include_once("../../config/db_config.php");
-include("../accounts/functions.php");
+include_once("../accounts/functions.php");
 sec_session_start(); // Our custom secure way of starting a PHP session.
 function user_role($mysqli,$username)
 {
@@ -176,7 +177,7 @@ if(login_check($mysqli))
 {
    echo "Welcome " .$_SESSION['user_name']."<br>";
 ?>
-                    <a href="#" id="try-1" class="try sprited">Change Your Password</a>
+                 <a href="#" id="try-1" class="try sprited">Change Your Password</a>
             <div id="sign_up">
                <h3>Update Password</h3>
                <p>
@@ -201,9 +202,9 @@ if(login_check($mysqli))
    </div>
 <br>
 <!-- IN PROGRESS -->
-
                 <a href="#" id="upload_button" class="upload_class sprited">Upload a Picture</a>
-            <div id="upload">
+<br>          
+  <div id="upload">
                <h3>Upload a Picture</h3>
                <p>Only .JPG images less than 1MB </p>
                   <form action="upload/upload_file.php" method="post"
@@ -214,8 +215,8 @@ if(login_check($mysqli))
                   </form>
                   <div id="actions">
                      <a class="close form_button sprited" id="cancel" href="#">Cancel</a>
-               </div>
-               </div>
+                  </div>
+         </div>
    </div>
 <?php   
    if(user_role($mysqli,$_SESSION['user_name']))
@@ -241,40 +242,70 @@ else
 {
 
    echo "You are not logged in. <br>";
-   echo "If you have an account, please <a href='index.php'>sign in</a>. <br>";
-   echo "If you don't have a login, please <a href='register.php'>Register</a>.";
+   echo "If you have an account, please <a href='index.html'>sign in</a>. <br>";
 }
 //sec_session_start();
 ?>
 
 
-</div>
-</div>
-</div>
-</div>
-      <div id="footer"> Copyright (c) 2014 <a href="https://www.sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
-         <a class='facebook' href='#' onclick="window.open('https://www.linkedin.com/in/sdsunjay','external');" >
-            <img alt='' src='../../gui/images/li.png' width="30" height="30" /></a>
-         <a class='twitter' href='#' onclick="window.open('https://www.twitter.com/sdsunjay','external');" >
-            <br>
-            <img alt='' src='../../gui/images/twitt.jpg' width="30" height="30"/></a>
-         <br>
-         <a href="https://bitcoin.org" target="_NEW">BitCoin</a>: <b>
-<script>
-CoinWidgetCom.go({
-   wallet_address: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
-      , currency: "bitcoin"
-      , counter: "hide"
-      , alignment: "bl"
-      , qrcode: true
-      , auto_show: false
-      , lbl_button: "1Shn9NDCuHeAeDDaHtCb9RFMV1kQr6uZx"
-      , lbl_address: "My Bitcoin Address:"
-      , lbl_count: "Donations"
-      , lbl_amount: "BTC"
-                                    });
-</script>
-         </b><br />
+
+
+
+
+
+
+<br>
+      <p>If you don't have a login, please <a href="register.html">Register</a>.</p>
+      <p>If you are done, please <a href="logout.php">Log Out</a>.</p>
+      <p><a href="forgot.php">Forgot your password</a>.</p>
       </div>
-   </body>
+   </div>
+</div>
+<!-- Scripts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!-- Google Analytics -->
+<script type="text/javascript" src="../../js/googleAnalytics.js"></script>
+<!-- Lightbox Script -->
+<script type="text/javascript" src="../../js/jquery.lightbox_me.js"></script>
+<!-- Upload Picture Script -->
+<!-- currently residing on this page -->
+<!-- TODO move to its own file -->
+<!--
+<script language="javascript" type="text/JavaScript" src="js/upload.js"></script>  
+-->
+<!-- Change Password Script -->
+<script language="javascript" type="text/JavaScript" src="js/change_password.js"></script>
+<!-- Lightbox Script for Login -->
+<script type="text/javascript" charset="utf-8">
+$(function() {
+      function launch() {
+      $('#sign_up').lightbox_me({centered: true, onLoad: function() { $('#sign_up').find('input:first').focus()}});
+      }
+      $('#try-1').click(function(e) {
+         $("#sign_up").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+            $("#sign_up").find("input:first").focus();
+            }});
+         e.preventDefault();
+         });
+      $('table tr:nth-child(even)').addClass('stripe');
+      });
+</script>
+<!-- Lightbox Script for Upload -->
+<script type="text/javascript" charset="utf-8">
+$(function() {
+   function launch() {
+      $('#upload').lightbox_me({centered: true, onLoad: function() { $('#upload').find('input:first').focus()}});
+            }
+            $('#upload_button').click(function(e) {
+               $("#upload").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+                  $("#upload").find("input:first").focus();
+                                }});
+                e.preventDefault();
+            });
+            $('table tr:nth-child(even)').addClass('stripe');
+        });
+</script>
+</body>
 </html>

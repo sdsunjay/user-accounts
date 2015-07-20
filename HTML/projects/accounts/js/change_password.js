@@ -3,7 +3,7 @@ function verifyPassword(password, password1)
  var matches = password.match(/\d+/g);
  if (matches != null) {
       if (password.length > 9 ){
-         if (password.length < 129){
+         if (password.length < 72){
             if (password.localeCompare(password1) == 0)
             {
                return true;
@@ -16,7 +16,7 @@ function verifyPassword(password, password1)
          }
          else
          {
-            message="Password must be 128 characters or less.";
+            message="Password must be 71 characters or less.";
             //password is too long
          }
       }

@@ -4,7 +4,7 @@
 
 <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<title>Registration</title>
+<title>Sunjay's Homepage</title>
 
 <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -16,7 +16,7 @@
 
             <meta charset="utf-8">
             <meta name="keywords" content="Sunjay, Dhama, Cal, Poly, California, Polytechnic, San Luis Obispo, Obispo, Software, Engineering, Computer, Science, Android, Security, C, C++, Java, Javascript, Python, CUDA, Terminal, HTML,CSS,JavaScript, PHP">
-            <meta name="description" content="User Accounts Registration">
+            <meta name="description" content="Sunjay's Homepage">
             <meta name="author" content="Sunjay Dhama">
             <meta content="images/batman.png" itemprop="image">
             <meta https-equiv="content-type" content="text/html; charset=utf-8" />
@@ -27,7 +27,7 @@
 <!-- Facebook -->
 <meta property="og:image" content="https://www.sunjaydhama.com/images/selfie.jpg"/>
 <meta property="og:type" content="website"/>
-<meta property="og:title" content="User Accounts Registration"/>
+<meta property="og:title" content="Sunjay's Homepage"/>
 <meta property="og:url" content="https://www.sunjaydhama.com/"/>
 <meta property="og:site_name" content="sunjaydhama.com"/>
 <meta property="og:description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California."/>
@@ -58,6 +58,9 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <link rel="stylesheet" href="../../../../css/normalize.css">
 <link rel="stylesheet" href="../../../../css/skeleton.css">
+<!-- specific to the User Accounts page -->
+<link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
 
@@ -65,52 +68,30 @@
 <!-- Nav
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <nav>
-   <ul>
-      <li><a href="../../gui/new/about.html">ABOUT</a></li>
-      <li><a href="../../gui/new/projects.html">PROJECTS</a></li>
-      <li>
-      <a href="../../gui/new/index.html">
-         <img id="navlogo" src="../../images/logo.png" alt="navagation-logo"></a></li>
-      <li><a href="../../gui/new/resume.html">R&Eacute;SUM&Eacute;</a></li>
-      <li><a href="../../gui/new/contact.html">CONTACT</a></li>
-   </ul>
-</nav>
+      <ul>
+         <li><a href="about.html">ABOUT</a></li>
+         <li><a href="projects.html">PROJECTS</a></li>
+         <li>
+         <a href="index.html">
+            <img id="navlogo" src="../../../images/logo.png" alt="navagation-logo"></a></li>
+         <li><a href="resume.html">R&Eacute;SUM&Eacute;</a></li>
+         <li><a href="contact.html">CONTACT</a></li>
+      </ul>
+   </nav>
 <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<div class="shell">
-  <div class="contact">
-      <div class="content-contactform">
-     <h3>Registration</h3>
-         <input type="text" id="username" name="username" size="64" placeholder="Username" autocorrect=off autocapitalize=words>
-         <br><input type="text" id="email" name="email" size="64" placeholder="Email" autocorrect=off autocapitalize=words  > 
-         <br>
-         <input type="password" id="password" name="password" size="64" placeholder="Password (Must be at least 10 characters)">
-         <br><input type="password" id="password1" name="password1" size="64" placeholder="Confirm Password"  >
 
-         <select name="question1" id="question1" >
-            <option value=1>What is your favorite actor's name?</option>
-            <option value=2>What is the last name of the teacher who gave you your first failing grade?</option>
-            <option value=3>If you could have any super power, what would it be?</option>
-            <option value=4>What was the name of your favorite teacher in school?</option>
-            <option value=5>In what city is your vacation home located?</option>
-            <option value=6>What was the nickname of your grandfather or grandmother?</option>
-         </select>               
-         <br>
-         <input type="text" id="answer1" name="answer1" size="64" placeholder="Must be at least 8 characters" autocorrect=off autocapitalize=words /><br>
-         <input id="submit" type="submit" name="submit" value="Register"/> 
-          <p>Return to the <a href="index.html">login</a></p>
-      </div>
-   </div>
-</div>
+  <div id="container-images">
+     <img src="images/splash.jpg">
+     <img src="images/splash1.jpg">
+     <img src="images/splash2.jpg">
+     <img src="images/splash3.jpg">
+  </div>
+
 <!-- Scripts
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<!-- Login Scripts -->
-<script language="javascript" type="text/JavaScript" src="js/register.js"></script>
-<script language="javascript" type="text/JavaScript" src="js/forms.js"></script>
+
 <!-- Google Analytics -->
 <script type="text/javascript" src="../../js/googleAnalytics.js"></script>
-
 </body>
 </html>

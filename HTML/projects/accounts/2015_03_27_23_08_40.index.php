@@ -36,7 +36,12 @@ $(function() {
 
     </script>
    <script type ="text/javascript" src="../../bitcoin/coin.js"></script>
+<?php
 
+include_once("../../config/db_config.php");
+include("../accounts/functions.php");
+sec_session_start(); // Our custom secure way of starting a PHP session.
+?>
 </head>
 <body>
 <div id="wrapper">
@@ -67,7 +72,7 @@ $(function() {
                 <div id="sidebar">
                         <h3>Sidebar</h3>
                         <ul class="list">
-                         <li class="first"><a href="https://sunjaydhama.com">Terminal</a></li>
+                         <li class="first"><a href="../terminal/index.html">Terminal</a></li>
                          <li><a href="#" onClick="window.open('https://github.com/sdsunjay?tab=repositories', 'external');">Github</a></li>
 
       <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/sdsunjay" data-widget-id="459207762094735360">Tweets by @sdsunjay</a>
@@ -75,6 +80,15 @@ $(function() {
   </ul>
 </div>
 <div id="content">
+<div id="errormsg">
+<?php
+
+if( isset($_SESSION['Error']) )
+{
+   echo $_SESSION['Error'];
+}
+?>
+</div>
 <div id="post1">
 
   <div id="Sign-In">
@@ -90,16 +104,13 @@ $(function() {
       <p>If you are done, please <a href="logout.php">Log Out</a>.</p>
       <p><a href="forgot.php">Forgot your password</a>.</p>
 <?php 
-include_once("../../config/db_config.php");
-include("../accounts/functions.php");
-sec_session_start(); // Our custom secure way of starting a PHP session.
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
-if( isset($_SESSION['Error']) )
-{
-   echo $_SESSION['Error'];
+//if( isset($_SESSION['Error']) )
+//{
+//   echo $_SESSION['Error'];
    //   unset($_SESSION['Error']);
-}
+//}
 
 
 $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);

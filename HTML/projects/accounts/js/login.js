@@ -3,7 +3,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
       // Send data to server through ajax call
       // action is functionality we want to call and outputJSON is our data
       $.ajax({
-         url: "check.php",
+         url: "https://www.sunjaydhama.com/projects/accounts/check.php",
          data: {
          action : 'login', 
          username: $("#username").val(),
@@ -25,23 +25,22 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
 
             if (result === "Yes")
             {
-               window.location = "protected_page.php";
+               //window.location = "protected_page.php";
+               window.location = "https://www.sunjaydhama.com/projects/accounts/protected_page.php";
             }
             else if(result === "No")
             {
                // window.location = "https://google.com";
-               window.location = "index.php";
+               window.location = "https://www.sunjaydhama.com/projects/accounts/index.html";
             }
             else
             {
                alert(result);
+               //alert("Unknown Fail");
                //window.location = "error.php";
             }
          },
-         /*error: function (request,error) {
                // This callback function will trigger on unsuccessful action                
-               alert('Network error has occurred please try again!');
-               }*/
          error: function(jqXHR, exception) {
           if (jqXHR.status === 0) {
              alert('Not connect.\n Verify Network.');

@@ -71,3 +71,18 @@ h2,h3,h4 {
     font-size: 1.2em;
     line-height: 31px;
  }
+ #errormsg {
+        color: red;
+     }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+   //height: 36px;
+   padding: 0px 0px; /* The 6px vertically centers text on FF, ignored by Webkit */
+}
