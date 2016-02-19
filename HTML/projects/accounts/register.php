@@ -32,12 +32,14 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'], $_POST['passw
       }
       else
       {
-         echo $feedback;
+         //echo $feedback;
+         echo $_SESSION['Error']; 
       }
    }
    else
    {
-      echo $feedback;
+      echo $_SESSION['Error']; 
+      //echo $feedback;
    }
 }
 
