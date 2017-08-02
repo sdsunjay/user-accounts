@@ -1,31 +1,16 @@
 <?php
-
-require_once '/usr/share/nginx/html/security/htmlpurifier/HTMLPurifier.standalone.php';
-
-#require_once '../../security/htmlpurifier/library/HTMLPurifier.auto.php';
-#require_once '../../security/htmlpurifier/library/HTMLPurifier.path.php';
-
-#require_once '../../security/htmlpurifier/library/HTMLPurifier.includes.php';
-#require_once '../../security/htmlpurifier/HTMLPurifier.standalone.php';
-#require_once '../../security/htmlpurifier/library/HTMLPurifier.autoload.php';
-/// require '/path/to/library/HTMLPurifier.path.php';
-
-  //      require 'HTMLPurifier.includes.php';
-#$config = HTMLPurifier_Config::createDefault();
- #  $config->set('URI.Base', 'https://www.sunjaydhama.com');
- #   $purifier = new HTMLPurifier($config);
 //sec_session_start();
 /*
  * XSS Protective Measures 
  */
-#require_once '../../security/htmlpurifier/library/HTMLPurifier.auto.php';
+require_once '/usr/share/nginx/html/security/htmlpurifier-4.9.3-standalone/HTMLPurifier.standalone.php';
 
-   function Redirect($url, $permanent = false)
-   {
-          header('Location: ' . $url, true, $permanent ? 301 : 302);
 
-              exit();
-   }
+function Redirect($url, $permanent = false){
+   header('Location: ' . $url, true, $permanent ? 301 : 302);
+   exit();
+}
+
 function esc_url($url) {
  
     if ('' == $url) {
@@ -94,56 +79,24 @@ function checkbrute($user_id,$mysql) {
 
 function login_check($mysqli) {
    // Check if all session variables are set 
-   if (isset($_SESSION['user_name'], $_SESSION['user_is_logged_in'], $_SESSION['user_id'])) {
+   if (isset($_SESSION['user_name'], $_SESSION['user_is_logged_in'])) {
 
-         $user_id = $_SESSION['user_id'];
-         $username = $_SESSION['user_name'];
+      $username = $_SESSION['user_name'];
 
-         // Get the user-agent string of the user.
-         $user_browser = $_SERVER['HTTP_USER_AGENT'];
+      // Get the user-agent string of the user.
+      $user_browser = $_SERVER['HTTP_USER_AGENT'];
 
-         if ($stmt = $mysqli->prepare("SELECT password FROM login WHERE id = ? LIMIT 1")) {
-            // Bind "$user_id" to parameter. 
-            $stmt->bind_param('i', $user_id);
-            $stmt->execute();   // Execute the prepared query.
-            $stmt->store_result();
-
-            if ($stmt->num_rows == 1) {
-               // If the user exists get variables from result.
-               $stmt->bind_result($password);
-               $stmt->fetch();
-               //$login_check = $login_string;
-               //not sure about this
-               //$login_check = hash('sha512', $password . $user_browser);
-
-               //if ($login_check == $login_string) {
-                  // Logged In!!!! 
-          /* close statement */
-             mysqli_stmt_close($stmt);
-                  return true;
-              // } else {
-                  // Not logged in 
-              // $stmt->close();
-                //  return false;
-              // }
-            } else {
-             mysqli_stmt_close($stmt);
-               // Not logged in 
-               return false;
-            }
-         } else {
-            // Not logged in 
-            return false;
-         }
+      if(checkUsernameExists($username,$mysqli)){
+         return true;
       } else {
          // Not logged in 
          return false;
       }
+   }
 }
-
 function sec_session_start() {
    $session_name = 'sec_session_id';   // Set a custom session name
-  // $secure = false;
+   // $secure = false;
    $secure = true;
    // This stops JavaScript being able to access the session id.
    $httpsonly = true;
@@ -163,7 +116,7 @@ function sec_session_start() {
    session_name($session_name);
    session_start();            // Start the PHP session 
    //session_regenerate_id();    // regenerated the session, delete the old one. 
-      //$_SESSION['user_is_logged_in'] = false; 
+   //$_SESSION['user_is_logged_in'] = false; 
 }
 function logout()
 {
@@ -182,55 +135,50 @@ function checkRegistrationData($username,$pass,$pass1)
    // validating the input
    if (!empty($username)
       && (strlen($username) <= 64)
-         && (strlen($username) >= 2)
-            && (preg_match('/^[a-z\d]{2,64}$/i', $username))
-         //      && (!empty($email))
-          //        && (strlen($email) <= 64)
-           //          && filter_var($email, FILTER_VALIDATE_EMAIL)
-                        && !empty($pass)
-                           && !empty($pass1)
-                              &&  (preg_match("(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$)",$pass))
-                                 && (strcmp($pass,$pass1) == 0 )
-                                    && (strlen($pass) < 72)
-                                       && ( strlen($pass1) < 72)
-                                          ) {
-                                             // only this case return true, only this case is valid
-                                             return true;
-                                          } 
-                                          else if(!preg_match("(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$)",$pass))
-                                          {
-                                             $feedback = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
-                                          }
-                                          else if (empty($username)) {
-                                             $feedback = "Empty Username";
-                                          } else if (empty($pass) || empty($pass1)) {
-                                             $feedback = "Empty Password";
-                                          } else if(strcmp($pass,$pass1) == 0) {
-                                             $feedback = "Password and password confirmation are not the same";
-                                          } else if (strlen($pass) < 10) {
-                                             $feedback = "Password has a minimum length of 10 characters";
-                                          } else if (strlen($username) > 64 || strlen($username) < 2) {
-                                             $feedback = "Username cannot be shorter than 2 or longer than 64 characters";
-                                          } elseif (!preg_match('/^[a-z\d]{2,64}$/i', $username)) {
-                                             $feedback = "Username does not fit the name scheme: only a-Z and numbers are allowed, 2 to 64 characters";
-                                          }
+      && (strlen($username) > 2)
+      && (preg_match('/^[a-zA-Z0-9]{3,}$/', $username))
+      //      && (!empty($email))
+      //        && (strlen($email) <= 64)
+      //          && filter_var($email, FILTER_VALIDATE_EMAIL)
+      && !empty($pass)
+      && !empty($pass1)
+      && (strcmp($pass,$pass1) == 0 )
+      && (strlen($pass) < 72)
+      && ( strlen($pass1) < 72)
+   ) {
+      // only this case return true, only this case is valid
+      return true;
+   } 
+   else if (empty($username)) {
+      $feedback = "Empty Username";
+   } else if (empty($pass) || empty($pass1)) {
+      $feedback = "Empty Password";
+   } else if(strcmp($pass,$pass1) == 0) {
+      $feedback = "Password and password confirmation are not the same";
+   } else if (strlen($pass) < 8) {
+      $feedback = "Password has a minimum length of 8 characters";
+   } else if (strlen($username) > 64 || strlen($username) < 3) {
+      $feedback = "Username cannot be shorter than 3 or longer than 64 characters";
+   }
+   else if(!preg_match('/^[a-zA-Z0-9]{3,}$/', $username)) { 
+      $feedback = "Username does not fit the name scheme: only a-Z and numbers are allowed";
+   }
                                          /* elseif (empty($email)) {
                                              $feedback = "Email cannot be empty";
                                           } elseif (strlen($email) > 64) {
                                              $feedback = "Email cannot be longer than 64 characters";
                                           }
-                                         
+
                                           elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                                              $feedback = "Your email address is not in a valid email format";
                                           }
-                                          */elseif (strlen($pass) >71) {
-                                             $feedback = "Password cannot be longer than 71 characters";
-                                          } elseif (strlen($pass1) > 71) {
-                                             $feedback = "Password cannot be longer than 71 characters";
-                                          }
-                                          else {
-                                             $feedback = "An unknown error occurred.";
-                                          }
+                                          */
+   elseif (strlen($pass) > 64) {
+      $feedback = "Password cannot be longer than 71 characters";
+   }
+   else {
+      $feedback = "An unknown error occurred.";
+   }
    $_SESSION['Error']=$feedback;
    // default return
    return false;
@@ -240,7 +188,7 @@ function checkRegistrationData($username,$pass,$pass1)
 function checkEmail($mysqli,$email)
 {
 
-   $query = "SELECT id FROM login WHERE email = ? LIMIT 1";
+   $query = "SELECT id FROM users WHERE email = ? LIMIT 1";
    $stmt = $mysqli->prepare($query);
 
    if ($stmt) {
@@ -278,7 +226,7 @@ function checkEmail($mysqli,$email)
 function checkUsernameExists($username,$mysqli)
 {
 
-   $chk_name = $mysqli->prepare("SELECT id FROM login WHERE username = ?");
+   $chk_name = $mysqli->prepare("SELECT id FROM users WHERE username = ?");
    $chk_name->bind_param('s',$username);
    // Execute the prepared query.
    if ($chk_name->execute()) {
@@ -308,14 +256,14 @@ function checkUsernameExists($username,$mysqli)
    else
    {
 
-         $_SESSION['Error']='Could not execute query';
+      $_SESSION['Error']='Could not execute query';
    }
    return false;
 }
 function checkUsername($mysqli,$username)
 {
 
-   $prep_stmt = "SELECT id FROM login WHERE username = ? LIMIT 1";
+   $prep_stmt = "SELECT id FROM users WHERE username = ? LIMIT 1";
    $stmt = $mysqli->prepare($prep_stmt);
 
    if ($stmt) {
@@ -331,8 +279,8 @@ function checkUsername($mysqli,$username)
          mysqli_stmt_close($stmt);
          return false;
       }
-         /* close statement */
-         mysqli_stmt_close($stmt);
+      /* close statement */
+      mysqli_stmt_close($stmt);
       return true;
    }
    else
@@ -364,67 +312,68 @@ function registerUserFromCli($username,$password,$password1)
       // Username validity and password validity have NOT been checked client side.
       // This should be adequate as nobody gains any advantage from
       // breaking these rules.
-         if(checkUsername($mysqli,$username))
-         {
-            //create a random salt
-            $random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
-            $salt = substr($random_salt, 0, 128); 
-            $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
-            // Insert the new user into the database 
-            if ($insert_user = $mysqli->prepare("INSERT INTO login (username, email, password,created_at, salt) VALUES (?, ?, ?,?,?)")) {
-               date_default_timezone_set('America/Los_Angeles');
-               $created_at =date("Y-m-d H:i:s");
-               $insert_user->bind_param('sssss', $username, $email, $temp_pass,$created_at,$salt);
-               // Execute the prepared query.
-               if ($insert_user->execute()) {
-                  /* close statement */
-                  mysqli_stmt_close($insert_user);
-                  $_SESSION['user_name'] = $username;
-                  $_SESSION['user_is_logged_in'] = true; 
-                  //temp fix for now
-                  $_SESSION['user_id'] = 1;
+      if(checkUsername($mysqli,$username))
+      {
+         //create a random salt
+         //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+         //$salt = substr($random_salt, 0, 128); 
+         $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+         // Insert the new user into the database 
+         if ($insert_user = $mysqli->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)")) {
+            date_default_timezone_set('America/Los_Angeles');
+            // $created_at =date("Y-m-d H:i:s");
+            $insert_user->bind_param('sss', $username, $email, $temp_pass);
+            // Execute the prepared query.
+            if ($insert_user->execute()) {
+               /* close statement */
+               mysqli_stmt_close($insert_user);
+               $_SESSION['user_name'] = $username;
+               $_SESSION['user_is_logged_in'] = true; 
+               //temp fix for now
+               $_SESSION['user_id'] = 1;
                   /* close connection */ mysqli_close($mysqli); 
                //  $mysqli->close(); 
-                  return true;
-               }
-               else
-               {
-                  $insert_user->close(); 
-                  $feedback = "Registration failure: INSERT";
-                  /* close connection */ mysqli_close($mysqli); 
-                  //$mysqli->close(); 
-                  $_SESSION['Error'] = $feedback;
-                  return false;
-
-               }
+               return true;
             }
-            else {
+            else
+            {
                $insert_user->close(); 
-               $feedback = "Database Error!";
+               $feedback = "Registration failure: INSERT";
+                  /* close connection */ mysqli_close($mysqli); 
                //$mysqli->close(); 
-               /* close connection */ mysqli_close($mysqli); 
                $_SESSION['Error'] = $feedback;
                return false;
+
             }
          }
-         else
-         {
-            $mysqli->close(); 
-            //$_SESSION['Error'] = $feedback;
+         else {
+            $insert_user->close(); 
+            $feedback = "Database Error!";
+            //$mysqli->close(); 
+               /* close connection */ mysqli_close($mysqli); 
+            $_SESSION['Error'] = $feedback;
             return false;
          }
+      }
+      else
+      {
+         $mysqli->close(); 
+         //$_SESSION['Error'] = $feedback;
+         return false;
+      }
    }
    else
    {
       return false;
    }
 }
-function registerUser($username,$email,$password,$password1)
+function registerUser($name, $username,$email,$password,$password1)
 {
    $config = HTMLPurifier_Config::createDefault();
    $purifier = new HTMLPurifier($config);
    $username = $purifier->purify($username);
-   $email = $purifier->purify($email);
+   $name = $purifier->purify($name);
+
    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
       $feedback = "Invalid email format"; 
       $_SESSION['Error'] = $feedback;
@@ -450,15 +399,14 @@ function registerUser($username,$email,$password,$password1)
          if(checkUsername($mysqli,$username))
          {
             //create a random salt
-            $random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
-            $salt = substr($random_salt, 0, 128); 
+            //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+            //$salt = substr($random_salt, 0, 128); 
 
             $temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
             // Insert the new user into the database 
-            if ($insert_user = $mysqli->prepare("INSERT INTO login (username, email, password, created_at, salt) VALUES (?, ?,?,?,?)")) {
+            if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)")) {
                date_default_timezone_set('America/Los_Angeles');
-               $created_at =date("Y-m-d H:i:s");
-               $insert_user->bind_param('sssss', $username, $email, $temp_pass,$created_at,$salt);
+               $insert_user->bind_param('ssss', $name, $username, $email, $temp_pass);
                // Execute the prepared query.
                if ($insert_user->execute()) {
                   /* close statement */
@@ -552,7 +500,7 @@ function updatePassword($username,$old_password,$new_password,$new_password1)
                      {
                         $temp_pass=password_hash($new_password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
                         date_default_timezone_set('America/Los_Angeles');
-                        $query_string="UPDATE login SET PASSWORD = ? where username = ?";
+                        $query_string="UPDATE users SET PASSWORD = ? where username = ?";
                         $stmt= $mysqli->prepare($query_string);
                         $stmt->bind_param('ss',$temp_pass,$username);
                         // Execute the prepared query.
@@ -598,7 +546,7 @@ function updatePassword($username,$old_password,$new_password,$new_password1)
 function getID($mysqli,$username)
 {
 
-   $chk_name= $mysqli->prepare("SELECT id FROM login WHERE username = ?");
+   $chk_name= $mysqli->prepare("SELECT id FROM users WHERE username = ?");
    $chk_name->bind_param('s',$username);
    // Execute the prepared query.
    if ($chk_name->execute()) {
@@ -625,7 +573,7 @@ function checkAnswer($mysqli,$answer,$uid)
 function getID_by_salt($mysqli,$salt)
 {
 
-   $chk_name= $mysqli->prepare("SELECT id FROM login WHERE salt = ?");
+   $chk_name= $mysqli->prepare("SELECT id FROM users WHERE salt = ?");
    $chk_name->bind_param('s',$salt);
    // Execute the prepared query.
    if ($chk_name->execute()) {
@@ -676,7 +624,7 @@ function getQuestionID($mysqli,$salt)
    $id = getID_by_salt($mysqli,$salt);
    if($id !== 0)
    {
-      $chk_name= $mysqli->prepare("SELECT questionID FROM questionsanswers WHERE id = ?");
+      $chk_name= $mysqli->prepare("SELECT question_id FROM user_answers WHERE id = ?");
       $chk_name->bind_param('i',$id);
       // Execute the prepared query.
       if ($chk_name->execute()) {
@@ -750,19 +698,19 @@ function insertQuestionsAnswers($question1,$answer1,$username)
 }
 function insertQuestion($mysqli,$uid,$question,$answer)
 {
-   $config = HTMLPurifier_Config::createDefault();
-   $purifier = new HTMLPurifier($config);
+   //$config = HTMLPurifier_Config::createDefault();
+   //$purifier = new HTMLPurifier($config);
    //purify answer 
-   $answer = $purifier->purify($answer);
-   if(strlen($answer)>7)
+   //$answer = $purifier->purify($answer);
+   if(strlen($answer)>7 && strlen($answer) < 255)
    {
 
       $temp_pass=password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
-      if ($insert_user = $mysqli->prepare("INSERT INTO questionsanswers (id,questionID,answerID) VALUES (?, ?,?)")) {
-         $insert_user->bind_param('iis', $uid, $question, $temp_pass);
+      if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
+         $insert_question->bind_param('iis', $uid, $question, $temp_pass);
          // Execute the prepared query.
-         if ($insert_user->execute()) {
-            $insert_user->close(); 
+         if ($insert_question->execute()) {
+            $insert_question->close(); 
             return true;
          }
          else
@@ -781,7 +729,7 @@ function insertQuestion($mysqli,$uid,$question,$answer)
    else
    {
 
-      $feedback = "Security question answer is not long enough";
+      $feedback = "Security question answer is not long enough or is too long";
       $_SESSION['Error'] = $feedback;
    }
    return false;
@@ -793,7 +741,7 @@ function insertQuestion($mysqli,$uid,$question,$answer)
 function login($username, $password,$mysqli) {
 
 
-   $chk_name= $mysqli->prepare("SELECT id,password FROM login WHERE username = ?");
+   $chk_name= $mysqli->prepare("SELECT id,password FROM users WHERE username = ?");
    $chk_name->bind_param('s',$username);
    // Execute the prepared query.
    if ($chk_name->execute()) {
@@ -806,7 +754,6 @@ function login($username, $password,$mysqli) {
       {
          $_SESSION['Error']="Username and password combination is incorrect.";
          return false;
-         //echo "<script type='text/javascript'>alert('$message');</script>";
       }
       $chk_name->close();
       //must remove last character, I have no idea why?
