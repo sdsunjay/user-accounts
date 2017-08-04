@@ -12,69 +12,69 @@ function Redirect($url, $permanent = false){
 }
 
 function esc_url($url) {
- 
-    if ('' == $url) {
-        return $url;
-    }
- 
-    $url = preg_replace('|[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\\x80-\\xff]|i', '', $url);
- 
-    $strip = array('%0d', '%0a', '%0D', '%0A');
-    $url = (string) $url;
- 
-    $count = 1;
-    while ($count) {
-        $url = str_replace($strip, '', $url, $count);
-    }
- 
-    $url = str_replace(';//', '://', $url);
- 
-    $url = htmlentities($url);
- 
-    $url = str_replace('&amp;', '&#038;', $url);
-    $url = str_replace("'", '&#039;', $url);
- 
-    if ($url[0] !== '/') {
-        // We're only interested in relative links from $_SERVER['PHP_SELF']
-        return '';
-    } else {
-        return $url;
-    }
+
+   if ('' == $url) {
+      return $url;
+   }
+
+   $url = preg_replace('|[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\\x80-\\xff]|i', '', $url);
+
+   $strip = array('%0d', '%0a', '%0D', '%0A');
+   $url = (string) $url;
+
+   $count = 1;
+   while ($count) {
+      $url = str_replace($strip, '', $url, $count);
+   }
+
+   $url = str_replace(';//', '://', $url);
+
+   $url = htmlentities($url);
+
+   $url = str_replace('&amp;', '&#038;', $url);
+   $url = str_replace("'", '&#039;', $url);
+
+   if ($url[0] !== '/') {
+      // We're only interested in relative links from $_SERVER['PHP_SELF']
+      return '';
+   } else {
+      return $url;
+   }
 }
 
- //There is a problem with this function
+//There is a problem with this function
 function checkbrute($user_id,$mysql) {
 
-    // All login attempts are counted from the past 1 hour. 
-    $prep = "SELECT time FROM login_attempts WHERE user_id = ? AND time > DATE_SUB(CURDATE(), INTERVAL 1 HOUR)";
-       
-       
-    //$prep = "SELECT time FROM login_attempts WHERE user_id = ?";
+   // All login attempts are counted from the past 1 hour. 
+   $prep = "SELECT time FROM login_attempts WHERE user_id = ? AND time > DATE_SUB(CURDATE(), INTERVAL 1 HOUR)";
 
-    $stmt = $mysql->prepare($prep);
 
-         if ($stmt) {
-            $stmt->bind_param('i', $user_id);
-            if($stmt->execute())
-            {
-               $stmt->store_result();
+   //$prep = "SELECT time FROM login_attempts WHERE user_id = ?";
 
-               // If there have been more than 3 failed logins 
-               if ($stmt->num_rows > 3) {
-                  //the below line causes the page not to work, not sure why..
-                  $stmt->close();
-                  return true;
-               } else {
-                  $stmt->close();
-                  return false;
-               }
-            }
-            else
-            {
-               return false;
-            }
+   $stmt = $mysql->prepare($prep);
+
+   if ($stmt) {
+      $stmt->bind_param('i', $user_id);
+      if($stmt->execute())
+      {
+         $stmt->store_result();
+
+         // If there have been more than 3 failed logins 
+         if ($stmt->num_rows > 3) {
+            //the below line causes the page not to work, not sure why..
+            $stmt->close();
+            return true;
+         } else {
+            $stmt->close();
+            return false;
          }
-    return false;
+      }
+      else
+      {
+         return false;
+      }
+   }
+   return false;
 }
 
 function login_check($mysqli) {
@@ -222,8 +222,33 @@ function checkEmail($mysqli,$email)
    return true;
 }
 
+function getUserID($mysqli, $username){
 
-function checkUsernameExists($username,$mysqli)
+   $query = "SELECT id FROM users WHERE username = ?";
+
+   $stmt = $mysqli->prepare($query);
+   $stmt->bind_param('i',$id);
+   // Execute the prepared query.
+   if ($stmt->execute()) {
+      //bind result variables
+      $stmt->bind_result($question);
+      $output = $stmt->fetch();
+      if($output)
+      {
+
+         $stmt->close();
+         return $question;
+      }
+      $stmt->close();
+   }
+   else
+   {
+      return NULL;
+
+   }
+}
+
+function checkUsernameExists($mysqli, $username)
 {
 
    $chk_name = $mysqli->prepare("SELECT id FROM users WHERE username = ?");
@@ -570,71 +595,50 @@ function checkAnswer($mysqli,$answer,$uid)
 {
 
 }
-function getID_by_salt($mysqli,$salt)
-{
+function getQuestion($mysqli, $username){
+   $user_id = getUserID($mysqli, $username);
+   $question_id = getQuestionID($mysqli,$user_id);
+   if(!$question_id != 0){
+      $query = "select question from questions where id = ?"; 
 
-   $chk_name= $mysqli->prepare("SELECT id FROM users WHERE salt = ?");
-   $chk_name->bind_param('s',$salt);
-   // Execute the prepared query.
-   if ($chk_name->execute()) {
-      //bind result variables
-      $chk_name->bind_result($uid);
-      $output=$chk_name->fetch();
-      if($output)
-      {
-         $chk_name->close();
-         return $uid;
-      }
-      $chk_name->close();
-   }
-   else
-   {
-      $_SESSION['Error'] = "Problem with selecting ID";
-   }
-   return 0;
-}
-function getQuestion($mysqli,$salt)
-{
-   $id = getQuestionID($mysqli,$salt);
-   $query = "select question from questions where id = ?"; 
-
-   $chk_name= $mysqli->prepare($query);
-   $chk_name->bind_param('i',$id);
-   // Execute the prepared query.
-   if ($chk_name->execute()) {
-      //bind result variables
-      $chk_name->bind_result($question);
-      $output=$chk_name->fetch();
-      if($output)
-      {
-
-         $chk_name->close();
-         return $question;
-      }
-      $chk_name->close();
-   }
-   else
-   {
-      return NULL;
-
-   }
-}
-function getQuestionID($mysqli,$salt)
-{
-   $id = getID_by_salt($mysqli,$salt);
-   if($id !== 0)
-   {
-      $chk_name= $mysqli->prepare("SELECT question_id FROM user_answers WHERE id = ?");
-      $chk_name->bind_param('i',$id);
+      $chk_name= $mysqli->prepare($query);
+      $chk_name->bind_param('i',$question_id);
       // Execute the prepared query.
       if ($chk_name->execute()) {
          //bind result variables
-         $chk_name->bind_result($uid);
+         $chk_name->bind_result($question);
+         $output=$chk_name->fetch();
+         if($output)
+         {
+
+            $chk_name->close();
+            return $question;
+         }
+         $chk_name->close();
+      }
+      else
+      {
+         return NULL;
+
+      }
+   }
+   return NULL;
+}
+
+function getQuestionID($mysqli,$user_id){
+   if($user_id !== 0)
+   {
+      $chk_name= $mysqli->prepare("SELECT question_id FROM user_answers WHERE user_id = ?");
+      $chk_name->bind_param('i',$user_id);
+      // Execute the prepared query.
+      if ($chk_name->execute()) {
+         //bind result variables
+         $chk_name->bind_result($question_id);
          $output=$chk_name->fetch();
          if($output)
          {
             $chk_name->close();
-            return $uid;
+            return $question_id;
          }
          $chk_name->close();
       }
@@ -649,8 +653,7 @@ function getQuestionID($mysqli,$salt)
    }   
    return 0;
 }
-function insertQuestionsAnswers($question1,$answer1,$username)
-{
+function insertQuestionsAnswers($question1,$answer1,$username){
 
    $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
    // check connection 
@@ -696,8 +699,7 @@ function insertQuestionsAnswers($question1,$answer1,$username)
    $mysqli->close();
    return false;
 }
-function insertQuestion($mysqli,$uid,$question,$answer)
-{
+function insertQuestion($mysqli,$uid,$question,$answer) {
    //$config = HTMLPurifier_Config::createDefault();
    //$purifier = new HTMLPurifier($config);
    //purify answer 
@@ -780,15 +782,13 @@ function login($username, $password,$mysqli) {
         echo "true verify hash and password\n";
     }*/
       //Have there been more than 3 failed login attempts?
-      if(checkbrute($uid,$mysqli) == false)
-      {
+      if(checkbrute($uid,$mysqli) == false){
          $_SESSION['user_id']=$uid;
          if (password_verify($password,$hash)) {
             /* Valid */
             return true;
          }
-         else
-         {
+         else{
             if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
                $insert_st->bind_param('i', $uid);
                // Execute the prepared query.
@@ -810,15 +810,13 @@ function login($username, $password,$mysqli) {
             return false;
          }
       }
-      else
-      {
+      else{
          $_SESSION['Error']="Account is temporarily locked.";
          return false;
       } 
 
    }
-   else
-   {
+   else{
       $_SESSION['Error']="Unable to execute query.";
       return false;
    }

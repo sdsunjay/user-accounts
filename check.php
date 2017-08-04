@@ -15,12 +15,12 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 $_SESSION['user_is_logged_in'] = false;         
 //there seems to be a problem with the line below
 if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
-   $name = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+   $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
-   if(is_null($name))
+   if(is_null($username))
    {
-      $message = "Name is null";
+      $message = "Username is null";
       $_SESSION['Error']=$message;
    }
    else if(is_null($password))
@@ -31,8 +31,8 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
    else
    {
       $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-      $name = preg_replace("/[^a-zA-Z0-9_\-]+/","",$name);
-      $name= $mysqli->escape_string($name);
+      //$name = preg_replace("/[^a-zA-Z0-9_\-]+/","",$name);
+      //$name= $mysqli->escape_string($name);
 
       //purifier broken
       //using html purifier
@@ -43,13 +43,14 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
       {
          $message = "Connect: failed";
          $_SESSION['Error']=$message;
-         echo "No";
+         $arr = array ('response'=>$message);
+         echo json_encode($arr);
       }
       
-      else if(login($name,$password,$mysqli))
+      else if(login($username,$password,$mysqli))
       {
          // Login success 
-         $_SESSION['user_name'] = $name;
+         $_SESSION['user_name'] = $username;
          $_SESSION['user_is_logged_in'] = true;         
         // $_SESSION['user']=1;
          $session_name = 'sec_session_id';   // Set a custom session name
@@ -57,7 +58,8 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
          // Sets the session name to the one set above.
          session_name($session_name);
          $mysqli->close();
-         echo "Yes";
+         $arr = array ('response'=>'yes');
+         echo json_encode($arr);
       }
       else
       {
@@ -65,15 +67,15 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
          // Login fail 
          $mysqli->close();
          $_SESSION['user_is_logged_in'] = false;         
-         echo "No";
+         $arr = array ('response'=>$_SESSION['Error']);
+         echo json_encode($arr);
       }
    }
 }
 else
 {
       $message = "Enter username and password";
-      $_SESSION['Error']=$message;
-      echo "No";
-   //echo "Enter username and password";
+      $arr = array ('response'=>$message);
+      echo json_encode($arr);
 }
 ?>

@@ -29,7 +29,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
       // Send data to server through ajax call
       // action is functionality we want to call and outputJSON is our data
       $.ajax({url: 'checkUsername.php',
-         data: {action : 'login', username: $("#username").val(),submit:true
+         data: {action : 'login', username: $("#username").val(), submit:true
          }, //send username and password and submit to check.php
          type: 'post',                   
             async: true,
@@ -45,31 +45,18 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                },
                   success: function (result) {
 
-                     if (result === "Yes")
-                     {
-                     
-                        //echo "Email has been sent";
-                        //call function to retrieve email address
-                        //if email address exists, send, if not notify admin.
-                        $to = "public@sunjaydhama.com";
-                        $subject = "My subject";
-                        $txt = "Hello world!";
-                        $headers = "From: webmaster@example.com" . "\r\n" . "CC: somebodyelse@example.com";
-
-                        mail($to,$subject,$txt,$headers);
-                        alert('Email has been sent.');
-
-       // echo "Sent";
+                     var data = JSON.parse(result);
+                     //console.log(responseData); // works. outputs to console success
+                     if (data.response == "yes"){
+                        alert(data.question);
                         //window.location = "protected_page.php";
                      }
-                     else if(result === "No")
-                     {
+                     else if(data.response === "no"){
                         alert('Username does not exist');
                         // window.location = "https://google.com";
                         //window.location = "index.php";
                      }
-                     else
-                     {
+                     else{
                         window.location = "error.php";
                      }
                   },
