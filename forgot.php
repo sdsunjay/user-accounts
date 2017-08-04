@@ -7,9 +7,15 @@
     <!--  <link rel="stylesheet" type="text/css" href="style.css">-->
    </head>
    <body id="body-color">
-  <div id="Sign-In">
+      <div id="Sign-In">
          <fieldset style="width:30%"><legend>Forgot Password</legend>
-               Username <br><input type="text" id="username"  name="username" size="40"><br>
+               Username <br><input type="text" id="username"  name="username" size="40" required><br>
+               <input id="submit" type="submit" name="submit" value="Submit">
+         </fieldset>
+      </div>
+      <div id="Secret-Question">
+         <fieldset style="width:30%"><legend>Forgot Password</legend>
+               Answer <br><input type="text" id="Answer"  name="Answer" size="40"><br>
                <input id="submit" type="submit" name="submit" value="Submit">
          </fieldset>
       </div>
@@ -48,11 +54,14 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                      var data = JSON.parse(result);
                      //console.log(responseData); // works. outputs to console success
                      if (data.response == "yes"){
-                        alert(data.question);
+                         $('#Sign-In').hide();
+                         $('#Question').show();
+                        //alert(data.question);
                         //window.location = "protected_page.php";
                      }
                      else if(data.response === "no"){
-                        alert('Username does not exist');
+                        alert(data.msg);
+                        //alert('Username does not exist');
                         // window.location = "https://google.com";
                         //window.location = "index.php";
                      }

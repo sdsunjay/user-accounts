@@ -227,24 +227,25 @@ function getUserID($mysqli, $username){
    $query = "SELECT id FROM users WHERE username = ?";
 
    $stmt = $mysqli->prepare($query);
-   $stmt->bind_param('i',$id);
+   $stmt->bind_param('s',$username);
    // Execute the prepared query.
    if ($stmt->execute()) {
       //bind result variables
-      $stmt->bind_result($question);
+      $stmt->bind_result($user_id);
       $output = $stmt->fetch();
       if($output)
       {
 
          $stmt->close();
-         return $question;
+         return $user_id;
       }
       $stmt->close();
    }
    else
    {
-      return NULL;
-
+      $feedback = "A problem occurred with this email"; 
+      $_SESSION['Error']=$feedback;
+      return 0;
    }
 }
 
@@ -591,40 +592,44 @@ function getID($mysqli,$username)
    }
    return 0;
 }
-function checkAnswer($mysqli,$answer,$uid)
-{
+
+function checkAnswer($mysqli,$answer,$uid){
 
 }
+
 function getQuestion($mysqli, $username){
    $user_id = getUserID($mysqli, $username);
-   $question_id = getQuestionID($mysqli,$user_id);
-   if(!$question_id != 0){
-      $query = "select question from questions where id = ?"; 
 
-      $chk_name= $mysqli->prepare($query);
-      $chk_name->bind_param('i',$question_id);
-      // Execute the prepared query.
-      if ($chk_name->execute()) {
-         //bind result variables
-         $chk_name->bind_result($question);
-         $output=$chk_name->fetch();
-         if($output)
-         {
+   if($user_id != 0){
+      $question_id = getQuestionID($mysqli,$user_id);
+      if($question_id != 0){
+         $query = "select question from questions where id = ?"; 
+         $chk_name= $mysqli->prepare($query);
+         $chk_name->bind_param('i',$question_id);
+         // Execute the prepared query.
+         if ($chk_name->execute()) {
+            //bind result variables
+            $chk_name->bind_result($question);
+            $output=$chk_name->fetch();
+            if($output)
+            {
 
+               $chk_name->close();
+               return $question;
+            }
             $chk_name->close();
-            return $question;
          }
-         $chk_name->close();
+         else
+         {
+            $_SESSION['Error'] = 'Unable to find question for '.$username;
+            return false;
+         }
       }
-      else
-      {
-         return NULL;
-
-      }
+      $_SESSION['Error'] = 'Unable to find question for '.$username;
+      return false;
    }
-   return NULL;
+   return false;
 }
-
 function getQuestionID($mysqli,$user_id){
    if($user_id !== 0)
    {
