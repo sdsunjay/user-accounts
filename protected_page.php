@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,42 +9,41 @@
 
 <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-            <link rel="icon" href="https://sunjaydhama.com/images/batman.png" type="image/x-icon">
-            <link rel="shortcut icon" href="https://sunjaydhama.com/images/batman.png" type="image/x-icon">
+<link rel="icon" href="https://sunjaydhama.com/images/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="https://sunjaydhama.com/images/favicon.ico" type="image/x-icon">
 
 <!-- Meta Content
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
             <meta charset="utf-8">
-            <meta name="keywords" content="Sunjay, Dhama, Cal, Poly, California, Polytechnic, San Luis Obispo, Obispo, Software, Engineering, Computer, Science, Android, Security, C, C++, Java, Javascript, Python, CUDA, Terminal, HTML,CSS,JavaScript, PHP">
+            <meta name="keywords" content="Sunjay, Dhama, Accounts, Security, PHP, Javascript, Terminal, HTML, CSS">
             <meta name="description" content="User Accounts: Protected Page">
             <meta name="author" content="Sunjay Dhama">
-            <meta content="images/batman.png" itemprop="image">
             <meta https-equiv="content-type" content="text/html; charset=utf-8" />
 
 <!-- SEO -->
-<link rel="canonical" href="https://www.sunjaydhama.com/" />
+<link rel="canonical" href="https://sunjaydhama.com/" />
 
 <!-- Facebook -->
-<meta property="og:image" content="https://www.sunjaydhama.com/images/selfie.jpg"/>
+<meta property="og:image" content="https://sunjaydhama.com/images/selfie.jpg"/>
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="User Accounts: Protected Page"/>
-<meta property="og:url" content="https://www.sunjaydhama.com/"/>
+<meta property="og:url" content="https://sunjaydhama.com/"/>
 <meta property="og:site_name" content="sunjaydhama.com"/>
-<meta property="og:description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California."/>
+<meta property="og:description" content="I'm a Software Engineer and am passionate about security, currently based in Oakland, California."/>
 <meta property=”og:locale” content=”en_US” />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:creator" content="@sdsunjay">
-<meta name="twitter:title" content="Sunjay Dhama">
-<meta name="twitter:description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California."/>
-<meta name="twitter:image:src" content="https://www.sunjaydhama.com/images/selfie.jpg">
+<meta name="twitter:title" content="User Accounts: Protected Page">
+<meta name="twitter:description" content="I'm a Software Engineer and am passionate about security, currently based in Oakland, California."/>
+<meta name="twitter:image:src" content="https://sunjaydhama.com/images/selfie.jpg">
 
 <!-- Google+ -->
 <meta itemprop="name" content="Sunjay Dhama">
-<meta itemprop="description" content="I'm a Software Engineer and am passionate about security, currently based in San Luis Obispo, California.">
-<meta itemprop="image" content="https://www.sunjaydhama.com/images/selfie.jpg">
+<meta itemprop="description" content="I'm a Software Engineer and am passionate about security, currently based in Oakland, California.">
+<meta itemprop="image" content="https://sunjaydhama.com/images/selfie.jpg">
 
 <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -73,13 +71,13 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <nav>
    <ul>
-      <li><a href="../../gui/new/about.html">ABOUT</a></li>
-      <li><a href="../../gui/new/projects.html">PROJECTS</a></li>
+      <li><a href="../../about.html">ABOUT</a></li>
+      <li><a href="../../projects.html">PROJECTS</a></li>
       <li>
-      <a href="../../gui/new/index.html">
+      <a href="../../index.html">
          <img id="navlogo" src="../../images/logo.png" alt="navagation-logo"></a></li>
-      <li><a href="../../gui/new/resume.html">R&Eacute;SUM&Eacute;</a></li>
-      <li><a href="../../gui/new/contact.html">CONTACT</a></li>
+      <li><a href="../../resume.html">R&Eacute;SUM&Eacute;</a></li>
+      <li><a href="../../contact.html">CONTACT</a></li>
    </ul>
 </nav>
 <!-- Primary Page Layout
@@ -94,11 +92,11 @@
 <?php
 include_once("../../config/db_config.php");
 include_once("../accounts/functions.php");
-sec_session_start(); // Our custom secure way of starting a PHP session.
+# sec_session_start(); // Our custom secure way of starting a PHP session.
 function user_role($mysqli,$username)
 {
 
-   $chk_name= $mysqli->prepare("SELECT id FROM login WHERE username = ?");
+   $chk_name= $mysqli->prepare("SELECT id FROM users WHERE username = ?");
    $chk_name->bind_param('s',$username);
    // Execute the prepared query.
    if ($chk_name->execute()) {
@@ -118,7 +116,6 @@ function user_role($mysqli,$username)
       $chk_name->bind_result($role_id);
       $output=$chk_name->fetch();
 
-      //must remove last character, I have no idea why?
       mysqli_stmt_close($chk_name);
    }
    $chk_name= $mysqli->prepare("SELECT role FROM roles WHERE id = ?");
@@ -145,7 +142,7 @@ function user_role($mysqli,$username)
 function showInfo($mysqli)
 {
 
-   $chk_name= $mysqli->prepare("SELECT username FROM login");
+   $chk_name= $mysqli->prepare("SELECT username FROM users");
    // Execute the prepared query.
    if ($chk_name->execute()) {
       /* bind result variables */
@@ -181,7 +178,7 @@ if(login_check($mysqli))
             <div id="sign_up">
                <h3>Update Password</h3>
                <p>
-               Passwords must be at least 10 characters long
+               Passwords must be at least 8 characters long
                <br>
                Passwords must contain:
                <br>
