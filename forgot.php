@@ -51,7 +51,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                         //echo "Email has been sent";
                         //call function to retrieve email address
                         //if email address exists, send, if not notify admin.
-                        $to = "sdsunjay73@yahoo.com";
+                        $to = "public@sunjaydhama.com";
                         $subject = "My subject";
                         $txt = "Hello world!";
                         $headers = "From: webmaster@example.com" . "\r\n" . "CC: somebodyelse@example.com";
