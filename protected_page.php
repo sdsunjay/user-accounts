@@ -264,6 +264,7 @@ else
 <!--
 <script language="javascript" type="text/JavaScript" src="js/upload.js"></script>  
 -->
+<script language="javascript" type="text/JavaScript" src="js/forms.js"></script>
 <!-- Change Password Script -->
 <script language="javascript" type="text/JavaScript" src="js/change_password.js"></script>
 <!-- Lightbox Script for Login -->
