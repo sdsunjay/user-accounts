@@ -243,18 +243,10 @@ else
 }
 //sec_session_start();
 ?>
-
-
-
-
-
-
-
-
 <br>
       <p>If you don't have a login, please <a href="register.html">Register</a>.</p>
       <p>If you are done, please <a href="logout.php">Log Out</a>.</p>
-      <p><a href="forgot.php">Forgot your password</a>.</p>
+      <p><a href="forgot_password.html">Forgot your password</a>.</p>
       </div>
    </div>
 </div>
