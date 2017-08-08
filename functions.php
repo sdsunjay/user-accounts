@@ -593,7 +593,7 @@ function getID($mysqli,$username)
    return 0;
 }
 
-function checkAnswer($mysqli, $user_answer, $question_id $user_id){
+function checkAnswer($mysqli, $user_answer, $question_id, $user_id){
 	    $query = "select answer from user_answers where user_id = ? and question_id = ?"; 
 	    $chk_name= $mysqli->prepare($query);
 	    $chk_name->bind_param('ii',$user_id, $question_id);
