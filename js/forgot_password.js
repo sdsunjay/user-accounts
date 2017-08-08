@@ -27,8 +27,10 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     var data = JSON.parse(result);
                     //console.log(responseData); // works. outputs to console success
                     if (data.response == "yes") {
+                       $("#question_container").html(data.question); 
                         $('#Sign-In').hide();
-                        $('#Question').show();
+                        $('#shell #contact #Secret-Question #question_container').html(data.question);
+                        $('#Secret-Question').show();
                         //alert(data.question);
                         //window.location = "protected_page.php";
                     } else if (data.response === "no") {
