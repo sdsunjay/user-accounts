@@ -1,25 +1,10 @@
 function verifyPassword(password, password1) {
-    var matches = password.match(/\d+/g);
-    if (matches != null) {
-        if (password.length > 7) {
-            if (password.length < 72) {
+        if (checkPassword(password) && checkPassword(password1)) {
                 if (password.localeCompare(password1) == 0) {
                     return true;
                 } else {
                     message = "Passwords do not match.";
-                    //passwords do not match
                 }
-            } else {
-                message = "Password must be 71 characters or less.";
-                //password is too long
-            }
-        } else {
-            message = "Password must be 8 characters or greater.";
-            //password is too short
-        }
-    } else {
-        message = "Password must contain at least one digit.";
-    }
     return false;
 }
 var message;
