@@ -102,7 +102,7 @@ if( isset($_SESSION['Error']) )
       </div>
       <p>If you don't have a login, please <a href="register.html">Register</a>.</p>
       <p>If you are done, please <a href="logout.php">Log Out</a>.</p>
-      <p><a href="forgot.php">Forgot your password</a>.</p>
+      <p><a href="forgot_password.html">Forgot your password</a>.</p>
 <?php 
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
