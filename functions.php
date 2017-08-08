@@ -593,153 +593,173 @@ function getID($mysqli,$username)
    return 0;
 }
 
-function checkAnswer($mysqli,$answer,$uid){
-
+function checkAnswer($mysqli, $user_answer, $question_id $user_id){
+	    $query = "select answer from user_answers where user_id = ? and question_id = ?"; 
+	    $chk_name= $mysqli->prepare($query);
+	    $chk_name->bind_param('ii',$user_id, $question_id);
+	    // Execute the prepared query.
+	    if ($chk_name->execute()) {
+		//bind result variables
+		$chk_name->bind_result($answer);
+		$output = $chk_name->fetch();
+		if($output){
+		    if(strcmp($user_answer, $answer) == 0){
+			return true;
+		    }
+		    else{
+			return false;
+		    }
+		}
+	    }
+	    return false;
 }
 
 function getQuestion($mysqli, $username){
-   $user_id = getUserID($mysqli, $username);
+    $user_id = getUserID($mysqli, $username);
 
-   if($user_id != 0){
-      $question_id = getQuestionID($mysqli,$user_id);
-      if($question_id != 0){
-         $query = "select question from questions where id = ?"; 
-         $chk_name= $mysqli->prepare($query);
-         $chk_name->bind_param('i',$question_id);
-         // Execute the prepared query.
-         if ($chk_name->execute()) {
-            //bind result variables
-            $chk_name->bind_result($question);
-            $output=$chk_name->fetch();
-            if($output)
-            {
-
-               $chk_name->close();
-               return $question;
-            }
-            $chk_name->close();
-         }
-         else
-         {
-            $_SESSION['Error'] = 'Unable to find question for '.$username;
-            return false;
-         }
-      }
-      $_SESSION['Error'] = 'Unable to find question for '.$username;
-      return false;
-   }
-   return false;
+    if($user_id != 0){
+	$question_id = getQuestionID($mysqli,$user_id);
+	if($question_id != 0){
+	    $query = "select question from questions where id = ?"; 
+	    $chk_name= $mysqli->prepare($query);
+	    $chk_name->bind_param('i',$question_id);
+	    // Execute the prepared query.
+	    if ($chk_name->execute()) {
+		//bind result variables
+		$chk_name->bind_result($question);
+		$output = $chk_name->fetch();
+		if($output){
+		    setcookie("username",$username);
+		    $_SESSION['username'] = $username;
+		    $_SESSION['question_id'] = $question_id;
+		    $_SESSION['user_id'] = $user_id;
+		    $chk_name->close();
+		    return $question;
+		}
+		$_SESSION['Error'] = 'Unable to find question for '.$username;
+		$chk_name->close();
+	    }
+	    else
+	    {
+		$_SESSION['Error'] = 'Unable to find question for '.$username;
+		return false;
+	    }
+	}
+	$_SESSION['Error'] = 'Unable to find question for '.$username;
+	return false;
+    }
+    return false;
 }
 function getQuestionID($mysqli,$user_id){
-   if($user_id !== 0)
-   {
-      $chk_name= $mysqli->prepare("SELECT question_id FROM user_answers WHERE user_id = ?");
-      $chk_name->bind_param('i',$user_id);
-      // Execute the prepared query.
-      if ($chk_name->execute()) {
-         //bind result variables
-         $chk_name->bind_result($question_id);
-         $output=$chk_name->fetch();
-         if($output)
-         {
-            $chk_name->close();
-            return $question_id;
-         }
-         $chk_name->close();
-      }
-      else
-      {
-         $_SESSION['Error'] = "Error finding question ID.";
-      }
-   }
-   else
-   {
-      $_SESSION['Error'] = "Unable to find user with that ID.";
-   }   
-   return 0;
+    if($user_id !== 0)
+    {
+	$chk_name= $mysqli->prepare("SELECT question_id FROM user_answers WHERE user_id = ?");
+	$chk_name->bind_param('i',$user_id);
+	// Execute the prepared query.
+	if ($chk_name->execute()) {
+	    //bind result variables
+	    $chk_name->bind_result($question_id);
+	    $output=$chk_name->fetch();
+	    if($output)
+	    {
+		$chk_name->close();
+		return $question_id;
+	    }
+	    $chk_name->close();
+	}
+	else
+	{
+	    $_SESSION['Error'] = "Error finding question ID.";
+	}
+    }
+    else
+    {
+	$_SESSION['Error'] = "Unable to find user with that ID.";
+    }   
+    return 0;
 }
 function insertQuestionsAnswers($question1,$answer1,$username){
 
-   $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
-   // check connection 
-   if (mysqli_connect_errno()) 
-   {
-      $feedback = "Connect failed";
-      $_SESSION['Error'] = $feedback;
-      $mysqli->close();
-      return false;
-   }
-   $id = getID($mysqli,$username);
-   if($id>0)
-   {
-      //two questions and two answers
-      if(insertQuestion($mysqli,$id,$question1,$answer1))
-      {
-         //if(insertQuestion($mysqli,$id,$question2,$answer2))
-         // {
-         $mysqli->close();
-         return true;
-        /* }
-         else
-         {
+    $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+    // check connection 
+    if (mysqli_connect_errno()) 
+    {
+	$feedback = "Connect failed";
+	$_SESSION['Error'] = $feedback;
+	$mysqli->close();
+	return false;
+    }
+    $id = getID($mysqli,$username);
+    if($id>0)
+    {
+	//two questions and two answers
+	if(insertQuestion($mysqli,$id,$question1,$answer1))
+	{
+	    //if(insertQuestion($mysqli,$id,$question2,$answer2))
+	    // {
+	    $mysqli->close();
+	    return true;
+	    /* }
+	       else
+	       {
 
-            $feedback = "Question 2 could not be added";
-            $_SESSION['Error'] = $feedback;
-        }*/
-      }
-      else
-      {
+	       $feedback = "Question 2 could not be added";
+	       $_SESSION['Error'] = $feedback;
+	       }*/
+	}
+	else
+	{
 
-         $feedback = "Question 1 could not be added";
-         $_SESSION['Error'] = $feedback;
-      }
+	    $feedback = "Question 1 could not be added";
+	    $_SESSION['Error'] = $feedback;
+	}
 
-   }
-   else
-   {
+    }
+    else
+    {
 
-      $feedback = "Username could not be found";
-      $_SESSION['Error'] = $feedback;
-   }
-   $mysqli->close();
-   return false;
+	$feedback = "Username could not be found";
+	$_SESSION['Error'] = $feedback;
+    }
+    $mysqli->close();
+    return false;
 }
 function insertQuestion($mysqli,$uid,$question,$answer) {
-   //$config = HTMLPurifier_Config::createDefault();
-   //$purifier = new HTMLPurifier($config);
-   //purify answer 
-   //$answer = $purifier->purify($answer);
-   if(strlen($answer)>7 && strlen($answer) < 255)
-   {
+    //$config = HTMLPurifier_Config::createDefault();
+    //$purifier = new HTMLPurifier($config);
+    //purify answer 
+    //$answer = $purifier->purify($answer);
+    if(strlen($answer)>7 && strlen($answer) < 255)
+    {
 
-      $temp_pass=password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
-      if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
-         $insert_question->bind_param('iis', $uid, $question, $temp_pass);
-         // Execute the prepared query.
-         if ($insert_question->execute()) {
-            $insert_question->close(); 
-            return true;
-         }
-         else
-         {
-            $feedback = "Registration failure: INSERT";
-            $_SESSION['Error'] = $feedback;
-            $insert_user->close();
-            return false;
-         }
-      }
-      else {
-         $feedback = "Database Error";
-         $_SESSION['Error'] = $feedback;
-      }
-   }
-   else
-   {
+	$temp_pass=password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
+	    $insert_question->bind_param('iis', $uid, $question, $temp_pass);
+	    // Execute the prepared query.
+	    if ($insert_question->execute()) {
+		$insert_question->close(); 
+		return true;
+	    }
+	    else
+	    {
+		$feedback = "Registration failure: INSERT";
+		$_SESSION['Error'] = $feedback;
+		$insert_user->close();
+		return false;
+	    }
+	}
+	else {
+	    $feedback = "Database Error";
+	    $_SESSION['Error'] = $feedback;
+	}
+    }
+    else
+    {
 
-      $feedback = "Security question answer is not long enough or is too long";
-      $_SESSION['Error'] = $feedback;
-   }
-   return false;
+	$feedback = "Security question answer is not long enough or is too long";
+	$_SESSION['Error'] = $feedback;
+    }
+    return false;
 }
 /**
  * Used to autheticate user when logging in
@@ -748,83 +768,83 @@ function insertQuestion($mysqli,$uid,$question,$answer) {
 function login($username, $password,$mysqli) {
 
 
-   $chk_name= $mysqli->prepare("SELECT id,password FROM users WHERE username = ?");
-   $chk_name->bind_param('s',$username);
-   // Execute the prepared query.
-   if ($chk_name->execute()) {
-      /* bind result variables */
-      $chk_name->bind_result($uid,$hash);
-      $output=$chk_name->fetch();
+    $chk_name= $mysqli->prepare("SELECT id,password FROM users WHERE username = ?");
+    $chk_name->bind_param('s',$username);
+    // Execute the prepared query.
+    if ($chk_name->execute()) {
+	/* bind result variables */
+	$chk_name->bind_result($uid,$hash);
+	$output=$chk_name->fetch();
 
-      //username does not exist in table
-      if($output==null)
-      {
-         $_SESSION['Error']="Username and password combination is incorrect.";
-         return false;
-      }
-      $chk_name->close();
-      //must remove last character, I have no idea why?
-      $hash=substr($hash, 0, -1);
-    /* if ( strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES') == 0)
-      {
-         echo "TRUE hash cmp";
-      }
-      else
-      {
-      echo 'hash: ';
-      echo strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES');
-      }
-      if (strcmp($password,'xxxxxx') == 0)
-      {
-         echo "TRUE password cmp\n";
-      }
-      else
-      {
-         echo 'password: ';
-         echo strcmp($password,'xxxxx');
-      }
-      if (password_verify('xxxxx','$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES')) {
-        echo "true verify hash and password\n";
-    }*/
-      //Have there been more than 3 failed login attempts?
-      if(checkbrute($uid,$mysqli) == false){
-         $_SESSION['user_id']=$uid;
-         if (password_verify($password,$hash)) {
-            /* Valid */
-            return true;
-         }
-         else{
-            if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
-               $insert_st->bind_param('i', $uid);
-               // Execute the prepared query.
-               if ($insert_st->execute()) {
-                  $insert_st->close();
-                  return false;
-               }
-               else
-               {
-                  $message = "Login Attempts failure: INSERT";
-                  $_SESSION['Error']=$message;
-                  $insert_st->close();
-                  return false;
-               }
+	//username does not exist in table
+	if($output==null)
+	{
+	    $_SESSION['Error']="Username and password combination is incorrect.";
+	    return false;
+	}
+	$chk_name->close();
+	//must remove last character, I have no idea why?
+	$hash=substr($hash, 0, -1);
+	/* if ( strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES') == 0)
+	   {
+	   echo "TRUE hash cmp";
+	   }
+	   else
+	   {
+	   echo 'hash: ';
+	   echo strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES');
+	   }
+	   if (strcmp($password,'xxxxxx') == 0)
+	   {
+	   echo "TRUE password cmp\n";
+	   }
+	   else
+	   {
+	   echo 'password: ';
+	   echo strcmp($password,'xxxxx');
+	   }
+	   if (password_verify('xxxxx','$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES')) {
+	   echo "true verify hash and password\n";
+	   }*/
+	//Have there been more than 3 failed login attempts?
+	if(checkbrute($uid,$mysqli) == false){
+	    $_SESSION['user_id']=$uid;
+	    if (password_verify($password,$hash)) {
+		/* Valid */
+		return true;
+	    }
+	    else{
+		if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
+		    $insert_st->bind_param('i', $uid);
+		    // Execute the prepared query.
+		    if ($insert_st->execute()) {
+			$insert_st->close();
+			return false;
+		    }
+		    else
+		    {
+			$message = "Login Attempts failure: INSERT";
+			$_SESSION['Error']=$message;
+			$insert_st->close();
+			return false;
+		    }
 
 
-            }
-            $_SESSION['Error']="Username and password combination is incorrect.";
-            return false;
-         }
-      }
-      else{
-         $_SESSION['Error']="Account is temporarily locked.";
-         return false;
-      } 
+		}
+		$_SESSION['Error']="Username and password combination is incorrect.";
+		return false;
+	    }
+	}
+	else{
+	    $_SESSION['Error']="Account is temporarily locked.";
+	    return false;
+	} 
 
-   }
-   else{
-      $_SESSION['Error']="Unable to execute query.";
-      return false;
-   }
+    }
+    else{
+	$_SESSION['Error']="Unable to execute query.";
+	return false;
+    }
 
 }
 ?>
