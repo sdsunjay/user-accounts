@@ -42,15 +42,15 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
          // Login fail
          $mysqli->close();
          $_SESSION['user_is_logged_in'] = false;
-         $arr = array ('response'=> $_SESSION['Error']);
+         $arr = array ('response'=> 'no', 'msg' => $_SESSION['Error']);
          echo json_encode($arr);
       }
    }
 }
 else
 {
-      $message = "Enter username and password";
-      $arr = array ('response'=> $message);
+      $msg = "Enter username and password";
+      $arr = array ('response'=> 'no', 'msg' => $msg);
       echo json_encode($arr);
 }
 ?>
