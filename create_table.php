@@ -2,6 +2,25 @@
 <?php
 include_once("../../config/db_config.php");
 
+function create_login_attempts($mysqli){
+
+   // sql to create table
+   $sql = "CREATE TABLE IF NOT EXISTS login_attempts ( 
+      id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT '0000-00-00 00:00:00', 
+      updated_at TIMESTAMP DEFAULT now() ON UPDATE now()
+      );"; 
+
+   if (mysqli_query($mysqli, $sql)) {
+      echo "Table user_roles created successfully<br>";
+   } else {
+      echo "Error creating table: " . mysqli_error($mysqli);
+   }
+
+}
+
 function insert_roles($mysqli){
 
    $roles = [
