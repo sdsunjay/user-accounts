@@ -46,12 +46,9 @@ function esc_url($url) {
 function checkbrute($user_id,$mysql) {
 
    // All login attempts are counted from the past 1 hour. 
-   $prep = "SELECT time FROM login_attempts WHERE user_id = ? AND time > DATE_SUB(CURDATE(), INTERVAL 1 HOUR)";
+   $query = "SELECT id FROM login_attempts WHERE user_id = ? AND updated_at > DATE_SUB(CURDATE(), INTERVAL 1 HOUR)";
 
-
-   //$prep = "SELECT time FROM login_attempts WHERE user_id = ?";
-
-   $stmt = $mysql->prepare($prep);
+   $stmt = $mysql->prepare($query);
 
    if ($stmt) {
       $stmt->bind_param('i', $user_id);
@@ -174,7 +171,7 @@ function checkRegistrationData($username,$pass,$pass1)
                                           }
                                           */
    elseif (strlen($pass) > 64) {
-      $feedback = "Password cannot be longer than 71 characters";
+      $feedback = "Password cannot be longer than 64 characters";
    }
    else {
       $feedback = "An unknown error occurred.";
@@ -416,7 +413,7 @@ function registerUser($name, $username,$email,$password,$password1)
          $_SESSION['Error'] = $feedback;
       }
 
-      // Username validity and password validity have NOT been checked client side.
+      // Username validity and password validity have been checked client side.
       // This should be adequate as nobody gains any advantage from
       // breaking these rules.
 
@@ -604,6 +601,7 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id){
 		$output = $chk_name->fetch();
 		if($output){
 		    if(strcmp($user_answer, $answer) == 0){
+	    $_SESSION['user_is_logged_in'] = true;
 			return true;
 		    }
 		    else{
@@ -766,23 +764,30 @@ function insertQuestion($mysqli,$uid,$question,$answer) {
  */
 
 function login($username, $password,$mysqli) {
-
-
-    $chk_name= $mysqli->prepare("SELECT id,password FROM users WHERE username = ?");
-    $chk_name->bind_param('s',$username);
+    
+    $stmt = $mysqli->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt->bind_param('s',$username);
     // Execute the prepared query.
-    if ($chk_name->execute()) {
+    if ($stmt->execute()) {
 	/* bind result variables */
-	$chk_name->bind_result($uid,$hash);
-	$output=$chk_name->fetch();
+	$stmt->bind_result($hash);
+        if ($stmt->num_rows != 1) {
+            // A user with this username already exists
+            $msg = "A user with this username already exists!"; 
+            $_SESSION['Error']= $msg;
+            /* close statement */
+            mysqli_stmt_close($stmt);
+            return false;
+         }
+	$output = $stmt->fetch();
 
 	//username does not exist in table
-	if($output==null)
+	if($output == null)
 	{
 	    $_SESSION['Error']="Username and password combination is incorrect.";
 	    return false;
 	}
-	$chk_name->close();
+	$stmt->close();
 	//must remove last character, I have no idea why?
 	$hash=substr($hash, 0, -1);
 	/* if ( strcmp($hash,'$2y$08$7ZTjDN3fDh4oiUzv2hJ/cOYXSiPCoBHFIDFb/uzSSIkDKuhY8y3ES') == 0)
@@ -808,8 +813,10 @@ function login($username, $password,$mysqli) {
 	   }*/
 	//Have there been more than 3 failed login attempts?
 	if(checkbrute($uid,$mysqli) == false){
-	    $_SESSION['user_id']=$uid;
 	    if (password_verify($password,$hash)) {
+	    $_SESSION['user_id'] = $uid;
+	    $_SESSION['user_name'] = $username;
+	    $_SESSION['user_is_logged_in'] = true;
 		/* Valid */
 		return true;
 	    }
