@@ -62,7 +62,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                 var parsed_data = JSON.parse(responseData);
                 //console.log(responseData); // works. outputs to console success
                 if (parsed_data.response == "yes") {
-                    window.location = "reset_password.php";
+                    window.location = "protected_page.php";
                 } else {
                     alert(parsed_data.response);
                 }
