@@ -594,8 +594,9 @@ function login($username, $password,$mysqli) {
 		/* bind result variables */
 		$stmt->bind_result($hash);
 		$output = $stmt->fetch();
+		// TO DO look more into when close should be called on the statement
 		if($output != null) {
-		    stmt->close();
+		    $stmt->close();
 		    //must remove last character, I have no idea why?
 		    $hash=substr($hash, 0, -1);
 		    //Have there been more than 3 failed login attempts?
