@@ -253,8 +253,9 @@ function checkUsernameExists($mysqli, $username) {
 	return false;
     }
 }
+
 function checkUsername($mysqli,$username) {
-    return checkUsernameExists($mysqli, $username)
+    return checkUsernameExists($mysqli, $username);
 }
 
 function registerUserFromCli($username,$password,$password1) {
@@ -319,8 +320,8 @@ function registerUserFromCli($username,$password,$password1) {
     }
     return false;
 }
-function registerUser($name, $username,$email,$password,$password1)
-{
+
+function registerUser($name, $username,$email,$password,$password1) {
     $config = HTMLPurifier_Config::createDefault();
     $purifier = new HTMLPurifier($config);
     $username = $purifier->purify($username);
@@ -331,29 +332,18 @@ function registerUser($name, $username,$email,$password,$password1)
 	$_SESSION['Error'] = $feedback;
 	return false;
     }
-    if(checkRegistrationData($username,$password,$password1))
-    {
-
+    if(checkRegistrationData($username,$password,$password1)) {
 	$mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 	// check connection
-	if (mysqli_connect_errno())
-	{
+	if (mysqli_connect_errno()) {
 	    $feedback = "Connect failed";
 	    $_SESSION['Error'] = $feedback;
 	}
-
 	// Username validity and password validity have been checked client side.
 	// This should be adequate as nobody gains any advantage from
 	// breaking these rules.
-
-	if(checkEmail($mysqli,$email))
-	{
-	    if(checkUsername($mysqli,$username))
-	    {
-		//create a random salt
-		//$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
-		//$salt = substr($random_salt, 0, 128);
-
+	if(checkEmail($mysqli,$email)) {
+	    if(checkUsername($mysqli,$username)) {
 		$temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
 		// Insert the new user into the database
 		if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)")) {
@@ -376,7 +366,6 @@ function registerUser($name, $username,$email,$password,$password1)
 			$mysqli->close();
 			$_SESSION['Error'] = $feedback;
 			return false;
-
 		    }
 		} else {
 		    $insert_user->close();
@@ -387,12 +376,10 @@ function registerUser($name, $username,$email,$password,$password1)
 		}
 	    } else {
 		$mysqli->close();
-		//$_SESSION['Error'] = $feedback;
 		return false;
 	    }
 	} else {
 	    $mysqli->close();
-	    //$_SESSION['Error'] = $feedback;
 	    return false;
 	}
     } else {
@@ -451,7 +438,8 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
     $_SESSION['Error'] = $message;
     return false;
 }
-function checkAnswer($mysqli, $user_answer, $question_id, $user_id){
+
+function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
     $query = "select answer from user_answers where user_id = ? and question_id = ?";
     $chk_name= $mysqli->prepare($query);
     $chk_name->bind_param('ii',$user_id, $question_id);
