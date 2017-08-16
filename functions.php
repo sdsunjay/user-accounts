@@ -585,7 +585,7 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
 
 function login($username, $password,$mysqli) {
     $user_id = getUserID($mysqli, $username);
-    if $user_id != 0){
+    if ($user_id != 0){
 	if(check_brute($user_id, $mysqli) == false){
 	    $stmt = $mysqli->prepare("SELECT password FROM users WHERE id = ?");
 	    $stmt->bind_param('i',$user_id);
