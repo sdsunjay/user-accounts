@@ -93,8 +93,8 @@ function checkAnswer(answer1) {
     }
 
     // check that the first answer is sufficiently long (min 3 chars)
-    if (answer1.length < 3) {
-        alert('Answers must be at least 3 characters long. Please try again');
+    if (answer1.length < 6) {
+        alert('Answers must be at least 6 characters long. Please try again');
         document.getelementbyid("answer1").focus();
         return false;
     }
