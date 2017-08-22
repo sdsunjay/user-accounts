@@ -77,7 +77,7 @@ function login_check($mysqli) {
 	    $username = $_SESSION['user_name'];
 	    // Get the user-agent string of the user.
 	    $user_browser = $_SERVER['HTTP_USER_AGENT'];
-	    if(checkUsernameExists($username,$mysqli)){
+	    if(checkUsernameExists($mysqli, $username)){
 		return true;
 	    }
 	}
@@ -175,7 +175,7 @@ function checkRegistrationData($username, $pass, $pass1) {
 }
 
 
-function checkEmail($mysqli,$email) {
+function checkEmailExists($mysqli, $email) {
 
     $query = "SELECT id FROM users WHERE email = ? LIMIT 1";
     $stmt = $mysqli->prepare($query);
@@ -190,17 +190,17 @@ function checkEmail($mysqli,$email) {
 		$_SESSION['Error']=$feedback;
 		/* close statement */
 		mysqli_stmt_close($stmt);
-		return false;
+		return true;
 	    }
 	    /* close statement */
 	    mysqli_stmt_close($stmt);
-	    return true;
+	    return false;
 	}
 	$feedback = "Problem executing query";
 	$_SESSION['Error']=$feedback;
 	/* close statement */
 	mysqli_stmt_close($stmt);
-	return false;
+	return true;
     }
     $feedback = "A problem occurred with this email";
     $_SESSION['Error']=$feedback;
@@ -244,7 +244,9 @@ function getUserID($mysqli, $username){
     }
     return $user_id;
 }
-
+/**
+ * Check if the username already exists in the database
+ */
 function checkUsernameExists($mysqli, $username) {
     $user_id = getUserID($mysqli, $username);
     if ($user_id != 0) {
@@ -254,16 +256,12 @@ function checkUsernameExists($mysqli, $username) {
     }
 }
 
-function checkUsername($mysqli,$username) {
-    return checkUsernameExists($mysqli, $username);
-}
-
-function registerUserFromCli($username,$password,$password1) {
+function registerUserFromCli($username, $password, $password1) {
     $config = HTMLPurifier_Config::createDefault();
     $purifier = new HTMLPurifier($config);
     $username = $purifier->purify($username);
     $email = "Test@gmail.com";
-    if(checkRegistrationData($username,$password,$password1)) {
+    if(checkRegistrationData($username, $password, $password1)) {
 	$mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 	// check connection
 	if (mysqli_connect_errno()) {
@@ -275,7 +273,7 @@ function registerUserFromCli($username,$password,$password1) {
 	// Username validity and password validity have NOT been checked client side.
 	// This should be adequate as nobody gains any advantage from
 	// breaking these rules.
-	if(checkUsername($mysqli,$username) == false) {
+	if(checkUsernameExists($mysqli, $username) == false) {
 	    //create a random salt
 	    //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
 	    //$salt = substr($random_salt, 0, 128);
@@ -321,7 +319,7 @@ function registerUserFromCli($username,$password,$password1) {
     return false;
 }
 
-function registerUser($name, $username,$email,$password,$password1) {
+function registerUser($name, $username, $email, $password, $password1) {
     $config = HTMLPurifier_Config::createDefault();
     $purifier = new HTMLPurifier($config);
     $username = $purifier->purify($username);
@@ -330,9 +328,7 @@ function registerUser($name, $username,$email,$password,$password1) {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 	$feedback = "Invalid email format";
 	$_SESSION['Error'] = $feedback;
-	return false;
-    }
-    if(checkRegistrationData($username,$password,$password1)) {
+    } else if(checkRegistrationData($username, $password, $password1)) {
 	$mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 	// check connection
 	if (mysqli_connect_errno()) {
@@ -342,9 +338,9 @@ function registerUser($name, $username,$email,$password,$password1) {
 	// Username validity and password validity have been checked client side.
 	// This should be adequate as nobody gains any advantage from
 	// breaking these rules.
-	if(checkEmail($mysqli,$email)) {
-	    if(checkUsername($mysqli,$username)) {
-		$temp_pass=password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	if(checkEmailExists($mysqli, $email) == false ) {
+	    if(checkUsernameExists($mysqli, $username) == false) {
+		$temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
 		// Insert the new user into the database
 		if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)")) {
 		    date_default_timezone_set('America/Los_Angeles');
@@ -355,36 +351,30 @@ function registerUser($name, $username,$email,$password,$password1) {
 			mysqli_stmt_close($insert_user);
 			$_SESSION['user_name'] = $username;
 			$_SESSION['user_is_logged_in'] = true;
-			//temp fix for now
-			$_SESSION['user_id'] = 1;
+			$_SESSION['user_id'] = getUserID($username);
 			/* close connection */ mysqli_close($mysqli);
 			//  $mysqli->close();
 			return true;
 		    } else {
 			$insert_user->close();
 			$feedback = "Registration failure: INSERT";
-			$mysqli->close();
 			$_SESSION['Error'] = $feedback;
-			return false;
+			$mysqli->close();
 		    }
 		} else {
 		    $insert_user->close();
 		    $feedback = "Database Error!";
-		    $mysqli->close();
 		    $_SESSION['Error'] = $feedback;
-		    return false;
+		    $mysqli->close();
 		}
 	    } else {
 		$mysqli->close();
-		return false;
 	    }
 	} else {
 	    $mysqli->close();
-	    return false;
 	}
-    } else {
-	return false;
     }
+    return false;
 }
 /**
  * Update user's password
@@ -438,7 +428,10 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
     $_SESSION['Error'] = $message;
     return false;
 }
-
+/**
+ * Check the user's supplied answer against what is in the database
+ * @param $user_answer - the user's supplied answer
+ */
 function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
     $query = "select answer from user_answers where user_id = ? and question_id = ?";
     $chk_name= $mysqli->prepare($query);
@@ -449,8 +442,11 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
 	$chk_name->bind_result($answer);
 	$output = $chk_name->fetch();
 	if($output) {
-	    if(strcmp($user_answer, $answer) == 0) {
-		$_SESSION['user_is_logged_in'] = true;
+	    $temp_answer = password_hash($user_answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	    if (password_verify($temp_answer, $answer)) {
+	    // TO DO - Sunjay, user should not be logged in, simply because they answered their secret
+	    // question
+	//	$_SESSION['user_is_logged_in'] = true;
 		return true;
 	    } else {
 		return false;
@@ -557,7 +553,7 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
     //purify answer
     //$answer = $purifier->purify($answer);
     if(strlen($answer) > 5 && strlen($answer) < 64) {
-	$temp_pass=password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	$temp_pass = password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
 	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
 	    $insert_question->bind_param('iis', $user_id, $question_id, $temp_pass);
 	    // Execute the prepared query.
@@ -579,6 +575,32 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
     }
     return false;
 }
+
+/**
+ * Insert user's login attempt into failed login attempts
+ * 3 failed attempts and we lock them out
+ */
+function insertIntoLoginAttempts($mysqli, $user_id){
+
+    $_SESSION['Error']="Username and password combination is incorrect.";
+    if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
+	$insert_st->bind_param('i', $user_id);
+	// Execute the prepared query.
+	if ($insert_st->execute()) {
+	    $insert_st->close();
+	} else {
+	    $message = "Login Attempts failure: INSERT";
+	    $_SESSION['Error']=$message;
+	    $insert_st->close();
+	}
+    } else {
+	$message = "Login Attempts failure: INSERT";
+	$_SESSION['Error']=$message;
+	$insert_st->close();
+    }
+
+}
+
 /**
  * Used to autheticate user when logging in
  */
@@ -586,43 +608,29 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
 function login($username, $password,$mysqli) {
     $user_id = getUserID($mysqli, $username);
     if ($user_id != 0){
+	//Have there been more than 3 failed login attempts?
 	if(check_brute($user_id, $mysqli) == false){
 	    $stmt = $mysqli->prepare("SELECT password FROM users WHERE id = ?");
-	    $stmt->bind_param('i',$user_id);
+	    $stmt->bind_param('i', $user_id);
 	    // Execute the prepared query.
 	    if ($stmt->execute()) {
 		/* bind result variables */
 		$stmt->bind_result($hash);
 		$output = $stmt->fetch();
 		// TO DO look more into when close should be called on the statement
-		if($output != null) {
+		if($output) {
 		    $stmt->close();
+		    // TO DO - Sunjay, check if this is still needed
 		    //must remove last character, I have no idea why?
-		    $hash=substr($hash, 0, -1);
-		    //Have there been more than 3 failed login attempts?
-		    if (password_verify($password,$hash)) {
+		    $hash = substr($hash, 0, -1);
+		    if (password_verify($password, $hash)) {
 			$_SESSION['user_id'] = $user_id;
 			$_SESSION['user_name'] = $username;
 			$_SESSION['user_is_logged_in'] = true;
 			/* Valid */
 			return true;
 		    } else {
-			$_SESSION['Error']="Username and password combination is incorrect.";
-			if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
-			    $insert_st->bind_param('i', $user_id);
-			    // Execute the prepared query.
-			    if ($insert_st->execute()) {
-				$insert_st->close();
-			    } else {
-				$message = "Login Attempts failure: INSERT";
-				$_SESSION['Error']=$message;
-				$insert_st->close();
-			    }
-			} else {
-			    $message = "Login Attempts failure: INSERT";
-			    $_SESSION['Error']=$message;
-			    $insert_st->close();
-			}
+			insertIntoLoginAttempts($mysqli, $user_id);
 		    }
 		} else {
 		    $_SESSION['Error']="Unable to fetch user's password from database.";
