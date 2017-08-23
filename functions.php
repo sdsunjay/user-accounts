@@ -277,7 +277,7 @@ function registerUserFromCli($username, $password, $password1) {
 	    //create a random salt
 	    //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
 	    //$salt = substr($random_salt, 0, 128);
-	    $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	    $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
 	    // Insert the new user into the database
 	    if ($insert_user = $mysqli->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)")) {
 		date_default_timezone_set('America/Los_Angeles');
@@ -340,7 +340,7 @@ function registerUser($name, $username, $email, $password, $password1) {
 	// breaking these rules.
 	if(checkEmailExists($mysqli, $email) == false ) {
 	    if(checkUsernameExists($mysqli, $username) == false) {
-		$temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+		$temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
 		// Insert the new user into the database
 		if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)")) {
 		    date_default_timezone_set('America/Los_Angeles');
@@ -376,6 +376,19 @@ function registerUser($name, $username, $email, $password, $password1) {
     }
     return false;
 }
+function helpUpdatePassword($mysqli, $username, $new_password, $new_password1){
+
+    date_default_timezone_set('America/Los_Angeles');
+    $temp_pass = password_hash($new_password, PASSWORD_BCRYPT,array("cost" => 9));
+    $query_string ="UPDATE users SET PASSWORD = ? where username = ?";
+    $stmt= $mysqli->prepare($query_string);
+    $stmt->bind_param('ss',$temp_pass,$username);
+    // Execute the prepared query.
+    if ($stmt->execute()) {
+	$stmt->close();
+	return true;
+    }
+}
 /**
  * Update user's password
  */
@@ -397,17 +410,7 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
 		    if ($result) {
 			//Are they already logged in?
 			if (login($username,$old_password,$mysqli)) {
-			    $temp_pass = password_hash($new_password, PASSWORD_BCRYPT,array("cost" => 9))."\n";
-			    date_default_timezone_set('America/Los_Angeles');
-			    $query_string="UPDATE users SET PASSWORD = ? where username = ?";
-			    $stmt= $mysqli->prepare($query_string);
-			    $stmt->bind_param('ss',$temp_pass,$username);
-			    // Execute the prepared query.
-			    if ($stmt->execute()) {
-				$stmt->close();
-				return true;
-			    }
-			    $stmt->close();
+			    return helpUpdatePassword($mysqli, $username, $new_password, $new_password1);
 			} else {
 			    $message = "Username and old password combination is incorrect.";
 			}
@@ -428,6 +431,7 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
     $_SESSION['Error'] = $message;
     return false;
 }
+
 /**
  * Check the user's supplied answer against what is in the database
  * @param $user_answer - the user's supplied answer
@@ -442,11 +446,11 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
 	$chk_name->bind_result($answer);
 	$output = $chk_name->fetch();
 	if($output) {
-	    $temp_answer = password_hash($user_answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	    $temp_answer = password_hash($user_answer, PASSWORD_BCRYPT,array("cost" => 9));
 	    if (password_verify($temp_answer, $answer)) {
-	    // TO DO - Sunjay, user should not be logged in, simply because they answered their secret
-	    // question
-	//	$_SESSION['user_is_logged_in'] = true;
+		// TO DO - Sunjay, user should not be logged in, simply because they answered their secret
+		// question
+		//	$_SESSION['user_is_logged_in'] = true;
 		return true;
 	    } else {
 		return false;
@@ -553,7 +557,7 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
     //purify answer
     //$answer = $purifier->purify($answer);
     if(strlen($answer) > 5 && strlen($answer) < 64) {
-	$temp_pass = password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9))."\n";
+	$temp_pass = password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9));
 	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
 	    $insert_question->bind_param('iis', $user_id, $question_id, $temp_pass);
 	    // Execute the prepared query.
@@ -602,42 +606,51 @@ function insertIntoLoginAttempts($mysqli, $user_id){
 }
 
 /**
+ * Helper function for login
+ */
+function verifyPassword($mysqli, $user_id, $password){
+
+    $stmt = $mysqli->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    // Execute the prepared query.
+    if ($stmt->execute()) {
+	/* bind result variables */
+	$stmt->bind_result($hash);
+	$output = $stmt->fetch();
+	// TO DO look more into when close should be called on the statement
+	if($output) {
+	    $stmt->close();
+	    // TO DO - Sunjay, check if this is still needed
+	    //must remove last character, I have no idea why?
+	    //$hash = substr($hash, 0, -1);
+	    $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
+	    if (password_verify($temp_pass, $hash)) {
+		$_SESSION['user_id'] = $user_id;
+		$_SESSION['user_name'] = $username;
+		$_SESSION['user_is_logged_in'] = true;
+		/* Valid */
+		return true;
+	    } else {
+		insertIntoLoginAttempts($mysqli, $user_id);
+	    }
+	} else {
+	    $_SESSION['Error']="Unable to fetch user's password from database.";
+	}
+    } else {
+	$_SESSION['Error']="Unable to fetch user's password from database.";
+    }
+    return false
+}
+
+/**
  * Used to autheticate user when logging in
  */
-
 function login($username, $password,$mysqli) {
     $user_id = getUserID($mysqli, $username);
     if ($user_id != 0){
 	//Have there been more than 3 failed login attempts?
 	if(check_brute($user_id, $mysqli) == false){
-	    $stmt = $mysqli->prepare("SELECT password FROM users WHERE id = ?");
-	    $stmt->bind_param('i', $user_id);
-	    // Execute the prepared query.
-	    if ($stmt->execute()) {
-		/* bind result variables */
-		$stmt->bind_result($hash);
-		$output = $stmt->fetch();
-		// TO DO look more into when close should be called on the statement
-		if($output) {
-		    $stmt->close();
-		    // TO DO - Sunjay, check if this is still needed
-		    //must remove last character, I have no idea why?
-		    $hash = substr($hash, 0, -1);
-		    if (password_verify($password, $hash)) {
-			$_SESSION['user_id'] = $user_id;
-			$_SESSION['user_name'] = $username;
-			$_SESSION['user_is_logged_in'] = true;
-			/* Valid */
-			return true;
-		    } else {
-			insertIntoLoginAttempts($mysqli, $user_id);
-		    }
-		} else {
-		    $_SESSION['Error']="Unable to fetch user's password from database.";
-		}
-	    } else {
-		$_SESSION['Error']="Unable to fetch user's password from database.";
-	    }
+	    return verifyPassword($mysqli, $user_id, $password);
 	} else {
 	    $_SESSION['Error']="Account is temporarily locked.";
 	}
