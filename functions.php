@@ -653,7 +653,7 @@ function verifyPassword($mysqli, $user_id, $password){
     } else {
 	$_SESSION['Error']="Unable to fetch user's password from database.";
     }
-    return false
+    return false;
 }
 
 /**
