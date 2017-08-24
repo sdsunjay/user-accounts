@@ -222,6 +222,7 @@ function getUserID($mysqli, $username){
     if ($stmt->execute()) {
 	//bind result variables
 	$stmt->bind_result($user_id);
+	// TO DO - Sunjay figure out why this fails in forgot password feature
 	if ($stmt->num_rows != 1) {
 	    // A user with this username already exists
 	    $msg = "A user with this username already exists!";
