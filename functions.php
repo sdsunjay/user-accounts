@@ -137,21 +137,21 @@ function checkRegistrationData($username, $pass, $pass1) {
 	    && (strlen($pass) <= 64)
 	    && ( strlen($pass1) <= 64)
        ) {
-	// only this case return true, only this case is valid
-	return true;
+	        // only this case return true, only this case is valid
+	         return true;
     }
-    else if (empty($username)) {
+    elseif (empty($username)) {
 	$feedback = "Empty Username";
-    } else if (empty($pass) || empty($pass1)) {
+    } elseif (empty($pass) || empty($pass1)) {
 	$feedback = "Empty Password";
-    } else if(strcmp($pass,$pass1) == 0) {
+    } elseif(strcmp($pass,$pass1) == 0) {
 	$feedback = "Password and password confirmation are not the same";
-    } else if (strlen($pass) < 8) {
+    } elseif (strlen($pass) < 8) {
 	$feedback = "Password has a minimum length of 8 characters";
-    } else if (strlen($username) > 64 || strlen($username) < 3) {
+    } elseif (strlen($username) > 64 || strlen($username) < 3) {
 	$feedback = "Username cannot be shorter than 3 or longer than 64 characters";
     }
-    else if(!preg_match('/^[a-zA-Z0-9]{3,}$/', $username)) {
+    elseif(!preg_match('/^[a-zA-Z0-9]{3,}$/', $username)) {
 	$feedback = "Username does not fit the name scheme: only a-Z and numbers are allowed";
     }
     /* elseif (empty($email)) {
@@ -328,7 +328,7 @@ function registerUser($name, $username, $email, $password, $password1) {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 	$feedback = "Invalid email format";
 	$_SESSION['Error'] = $feedback;
-    } else if(checkRegistrationData($username, $password, $password1)) {
+    } elseif(checkRegistrationData($username, $password, $password1)) {
 	$mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 	// check connection
 	if (mysqli_connect_errno()) {
@@ -376,19 +376,44 @@ function registerUser($name, $username, $email, $password, $password1) {
     }
     return false;
 }
-function helpUpdatePassword($mysqli, $username, $new_password, $new_password1){
+function helpUpdatePassword($mysqli, $user_id, $new_password){
 
     date_default_timezone_set('America/Los_Angeles');
     $temp_pass = password_hash($new_password, PASSWORD_BCRYPT,array("cost" => 9));
-    $query_string ="UPDATE users SET PASSWORD = ? where username = ?";
-    $stmt= $mysqli->prepare($query_string);
-    $stmt->bind_param('ss',$temp_pass,$username);
+    $query_string ="UPDATE users SET PASSWORD = ? where user_id = ?";
+    $stmt = $mysqli->prepare($query_string);
+    $stmt->bind_param('si',$temp_pass, $user_id);
     // Execute the prepared query.
     if ($stmt->execute()) {
 	$stmt->close();
 	return true;
+    }else {
+	$message = "Update Password failure: Update Password INSERT";
     }
+    $_SESSION['Error'] = $message;
+    return false;
 }
+
+function validatePassword($mysqli, $new_password, $new_password1){
+
+    if(strcmp($new_password, $new_password1) == 0 ) {
+	if( (strlen($new_password) <= 64) && (strlen($new_password) >= 8)) {
+	    $result = (preg_match('/[A-Z]+/', $new_password) && preg_match('/[a-z]+/', $new_password) && preg_match('/\d/', $new_password));
+	    if ($result) {
+		return true;
+	    } else {
+		$message = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
+	    }
+	} else {
+	    $message = "Password length must be between 8 and 64 characters.";
+	}
+    } else {
+	$message = "Passwords do not match.";
+    }
+    $_SESSION['Error'] = $message;
+    return false;
+}
+
 /**
  * Update user's password
  */
@@ -404,25 +429,14 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
 	} elseif(is_null($new_password1)) {
 	    $message = "New password is null";
 	} else {
-	    if(strcmp($new_password, $new_password1) == 0 ) {
-		if( (strlen($new_password) <= 64) && (strlen($new_password) >= 8)) {
-		    $result = (preg_match('/[A-Z]+/', $new_password) && preg_match('/[a-z]+/', $new_password) && preg_match('/\d/', $new_password));
-		    if ($result) {
-			//Are they already logged in?
-			if (login($username,$old_password,$mysqli)) {
-			    return helpUpdatePassword($mysqli, $username, $new_password, $new_password1);
-			} else {
-			    $message = "Username and old password combination is incorrect.";
-			}
-		    } else {
-			$message = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
-		    }
-		} else {
-		    $message = "Password length must be between 8 and 64 characters.";
-		    //$message = $username . "does NOT exist.";
+	    //Does the old password match
+	    if (login($username,$old_password,$mysqli)) {
+		if(validatePassword($mysqli, $new_password, $new_password1)){
+	//TO DO - Sunjay update user_id
+		    return helpUpdatePassword($mysqli, $user_id, $new_password);
 		}
 	    } else {
-		$message = "Passwords do not match.";
+		$message = "Username and old password combination is incorrect.";
 	    }
 	}
     } else {
@@ -460,7 +474,7 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
     return false;
 }
 /*
- * For a given user, get their security question 
+ * For a given user, get their security question
  */
 function getQuestion($mysqli, $username){
     $user_id = getUserID($mysqli, $username);
@@ -654,7 +668,7 @@ function login($username, $password,$mysqli) {
 	} else {
 	    $_SESSION['Error']="Account is temporarily locked.";
 	}
-    } 
+    }
     return false;
 }
 ?>
