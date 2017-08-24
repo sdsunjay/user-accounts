@@ -1,6 +1,7 @@
 $(document).on('click', '#submit', function() { // catch the form's submit event
-    if (regformhash(document.getElementById("name"), document.getElementById("username"), document.getElementById("email"), document.getElementById("password"), document.getElementById("password1"), document.getElementById("answer1"))) {
-        if (validateEmail($('#email').val())) {
+    if (regformhash(document.getElementById("name"), document.getElementById("username"),
+	    document.getElementById("email"), document.getElementById("password"),
+	    document.getElementById("password1"), document.getElementById("answer1"))) {
             if (validateQuestion($('#question1').val())) {
                 $.ajax({
                         method: "POST",
@@ -32,9 +33,6 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
             } else {
                 alert('Error with Question 1.');
             }
-        } else {
-            alert('Please fix email field.');
-        }
     }
     return false; // cancel original event to prevent form submitting
 });
@@ -44,10 +42,6 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
    function validateEmail(email) {
    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;  return re.test(email);
    }*/
-function validateEmail(email) {
-    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return re.test(email);
-}
 
 function validateQuestion(n) {
     if (n === "1" || n === "2" || n === "3" || n === "4" || n === "5" || n === "6")

@@ -20,6 +20,11 @@ function testPassword(str) {
     return re.test(str);
 }
 
+function checkEmail(email) {
+    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return re.test(email);
+}
+
 function checkUsername(username) {
     // Check the username
     re = /^\w+$/;
@@ -30,18 +35,31 @@ function checkUsername(username) {
     }
 
     // Check that the username is sufficiently long (min 3 chars)
-    if (username.length < 3) {
+    if (username.value.length < 3) {
         alert('Usernames must be at least 3 characters long.  Please try again');
+        document.getElementById("username").focus();
+        return false;
+    }
+    // Check that the username is sufficiently long (min 3 chars)
+    if (username.value.length > 64) {
+        alert('Usernames must be 64 character or less.  Please try again');
         document.getElementById("username").focus();
         return false;
     }
     return true;
 }
 
-function checkPassword(password) {
+function checkPassword(password, conf) {
+
+    // Check that the password IS the same as the confirmation password
+    if (password.value.localeCompare(conf.value) != 0) {
+        alert("Error: Password and Password Confirmation do not match.");
+        document.getElementById("password").focus();
+        return false;
+    }
 
     // Check that the password is sufficiently long (min 8 chars)
-    if (password.length < 8) {
+    if (password.value.length < 8) {
         alert('Passwords must be at least 8 characters long.  Please try again');
         //form.password.focus();
         document.getElementById("password").focus();
@@ -49,7 +67,7 @@ function checkPassword(password) {
     }
 
     // Check that the password is not too long (max 64 chars)
-    if (password.length > 64) {
+    if (password.value.length > 64) {
         alert('Passwords must be 64 character or less.  Please try again');
         //form.password.focus();
         document.getElementById("password").focus();
@@ -92,14 +110,14 @@ function checkAnswer(answer1) {
         return false;
     }
 
-    // check that the first answer is sufficiently long (min 3 chars)
-    if (answer1.length < 6) {
-        alert('Answers must be at least 6 characters long. Please try again');
+    // check that the first answer is sufficiently long (min 5 chars)
+    if (answer1.value.length < 5) {
+        alert('Answers must be at least 5 characters long. Please try again');
         document.getelementbyid("answer1").focus();
         return false;
     }
     // check that the first answer is not too long (max 64 chars)
-    if (answer1.length > 64) {
+    if (answer1.value.length > 64) {
         alert('Answers must be 64 characters or fewer. Please try again');
         document.getelementbyid("answer1").focus();
         return false;
@@ -118,36 +136,31 @@ function regformhash(name, username, email, password, conf, answer1) {
         return false;
     }
     if (checkUsername(username)) {
-        if (checkPassword(password)) {
-            if (checkAnswer(answer1)) {
+	if (checkPassword(password, conf)) {
+	    if (checkAnswer(answer1)) {
+		if (checkEmail(email)) {
 
-                // Check the name
-                if (name.value != '') {
-                    if ((/^[a-zA-Z]+$/.test(name.value) == false) || (/^[A-Za-z\s]+$/.test(name.value) == false)) {
-                        alert("Name must contain only letters and spaces. Please try again");
-                        document.getElementById("name").focus();
-                        return false;
-                    }
-                }
+		    // Check the name
+		    if (name.value != '') {
+			if ((/^[a-zA-Z]+$/.test(name.value) == false) || (/^[A-Za-z\s]+$/.test(name.value) == false)) {
+			    alert("Name must contain only letters and spaces. Please try again");
+			    document.getElementById("name").focus();
+			    return false;
+			}
+		    }
 
-                // Check that the password is not the same as the username
-                if (password.value.localeCompare(username.value) == 0) {
-                    alert("Error: Password must be different from Username!");
-                    document.getElementById("password").focus();
-                    return false;
-                }
+		    // Check that the password is not the same as the username
+		    if (password.value.localeCompare(username.value) == 0) {
+			alert("Error: Password must be different from Username!");
+			document.getElementById("password").focus();
+			return false;
+		    }
 
-                // Check that the password IS the same as the confirmation password
-                if (password.value.localeCompare(conf.value) != 0) {
-                    alert("Error: Password must be different from Username!");
-                    document.getElementById("password").focus();
-                    return false;
-                }
-
-                // Finally submit the form.
-                //  form.submit();
-                return true;
-            }
-        }
+		    // Finally submit the form.
+		    //  form.submit();
+		    return true;
+		}
+	    }
+	}
     }
 }
