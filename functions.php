@@ -222,15 +222,19 @@ function getUserID($mysqli, $username){
     if ($stmt->execute()) {
 	//bind result variables
 	$stmt->bind_result($user_id);
+	$output = $stmt->fetch();
+	// TO DO - should fetch come before or after $stmt->num_rows (line 226) 
 	// TO DO - Sunjay figure out why this fails in forgot password feature
-	if ($stmt->num_rows != 1) {
+	if ($stmt->num_rows > 1) {
 	    // A user with this username already exists
 	    $msg = "A user with this username already exists!";
 	    $_SESSION['Error']= $msg;
 	    /* close statement */
 	    $stmt->close();
+	} elseif ($stmt->num_rows < 1) {
+	    $feedback = "Could not find a user with this username";
+	    $_SESSION['Error'] = $feedback;
 	} else {
-	    $output = $stmt->fetch();
 	    if($output){
 		$stmt->close();
 	    } else {
@@ -280,10 +284,11 @@ function registerUserFromCli($username, $password, $password1) {
 	    //$salt = substr($random_salt, 0, 128);
 	    $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
 	    // Insert the new user into the database
-	    if ($insert_user = $mysqli->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)")) {
+	    if ($insert_user = $mysqli->prepare("INSERT INTO users (username, email, password,
+		created_at) VALUES (?, ?, ?, ?)")) {
 		date_default_timezone_set('America/Los_Angeles');
-		// $created_at =date("Y-m-d H:i:s");
-		$insert_user->bind_param('sss', $username, $email, $temp_pass);
+		$created_at = date("Y-m-d H:i:s");
+		$insert_user->bind_param('sss', $username, $email, $temp_pass, $created_at);
 		// Execute the prepared query.
 		if ($insert_user->execute()) {
 		    /* close statement */
