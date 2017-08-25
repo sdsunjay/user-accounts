@@ -40,7 +40,7 @@ function checkUsername(username) {
         document.getElementById("username").focus();
         return false;
     }
-    // Check that the username is sufficiently long (min 3 chars)
+    // Check that the username is not too long (max 64 chars)
     if (username.value.length > 64) {
         alert('Usernames must be 64 character or less.  Please try again');
         document.getElementById("username").focus();
@@ -133,9 +133,7 @@ function regformhash(name, username, email, password, conf, answer1) {
         conf.value == '') {
 
         alert('You must provide all the requested details. Please try again');
-        return false;
-    }
-    if (checkUsername(username)) {
+    } else if (checkUsername(username)) {
 	if (checkPassword(password, conf)) {
 	    if (checkAnswer(answer1)) {
 		if (checkEmail(email)) {
@@ -163,4 +161,5 @@ function regformhash(name, username, email, password, conf, answer1) {
 	    }
 	}
     }
+    return false;
 }
