@@ -27,7 +27,8 @@ function checkEmail(email) {
 
 function checkUsername(username) {
     // Check the username
-    re = /^\w+$/;
+   console.log(username);
+   re = /^\w+$/;
     if (!re.test(username.value)) {
         alert("Username must contain only letters, numbers and underscores. Please try again");
         document.getElementById("username").focus();
