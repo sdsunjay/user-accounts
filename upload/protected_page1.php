@@ -73,7 +73,7 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 function showInfo($mysqli)
 {
 
-   $chk_name= $mysqli->prepare("SELECT username FROM login");
+   $chk_name= $mysqli->prepare("SELECT username FROM users");
    // Execute the prepared query.
    if ($chk_name->execute()) {
       /* bind result variables */
@@ -124,17 +124,14 @@ if(login_check($mysqli))
                </div>
             </div>
 <?php   
-if(user_role($mysqli,$_SESSION['user_name']))
-   {
+if(user_role($mysqli,$_SESSION['user_name'])) {
       echo "<h4><a href='./account.html'>Update Password</a></h4>";
-   }
-   else
-   {
+} else {
       //echo "You are <b> not </b> an administrator <br>";
 
-   }
-   echo "You are securely logged in. <br>"; 
-   echo "If you are done, please <a href='logout.php'>Log Out</a>.";
+}
+echo "You are securely logged in. <br>"; 
+echo "If you are done, please <a href='logout.php'>Log Out</a>.";
    
 }
 else
@@ -152,7 +149,7 @@ else
 </div>
 </div>
 </div>
-                  <div id="footer"> Copyright (c) 2014 <a href="https://www.sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
+                  <div id="footer"> Copyright (c) 2017 <a href="https://sunjaydhama.com/">Sunjay Dhama</a>. All rights reserved. Template by <a href="https://www.freecsstemplates.org/">CSS Templates</a><br>
 <a class='facebook' href='#' onclick="window.open('https://www.linkedin.com/in/sdsunjay','external');" >
                         <img alt='' src='../../gui/images/li.png' width="30" height="30" /></a>
                      <a class='twitter' href='#' onclick="window.open('https://www.twitter.com/sdsunjay','external');" >
