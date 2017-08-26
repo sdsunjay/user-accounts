@@ -4,7 +4,7 @@ include_once("../../config/db_config.php");
 include_once 'functions.php';
 
 
-function verify_answer($answer, $action){
+function verify_answer($mysqli, $answer, $action){
     if ($action == 'checkAnswer') {
         if (checkAnswer($mysqli, $answer, $_SESSION['question_id'], $_SESSION['user_id'])) {
             $arr = array('response' => 'yes');
@@ -16,7 +16,7 @@ function verify_answer($answer, $action){
     }
 }
 
-function verify_username($username, $action){
+function verify_username($mysqli, $username, $action){
     if ($action == 'checkUsername') {
         if (checkUsernameExists($mysqli, $username)) {
             $questionForUser = getQuestion($mysqli, $username);
@@ -29,7 +29,7 @@ function verify_username($username, $action){
     }
 }
 
-function reset_password($password, $password1, $action){
+function reset_password($mysqli, $password, $password1, $action){
     if ($action == 'checkPassword') {
         if (validatePassword($mysqli, $password, $password1)) {
             if (helpUpdatePassword($mysqli, $_SESSION['user_id'], $password)) {
@@ -51,18 +51,18 @@ $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 if (isset($_POST['submit'], $_POST['username'], $_POST['action'])) {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
-    verify_username($username, $action);
+    verify_username($mysqli, $username, $action);
 } elseif (isset($_POST['submit'], $_POST['answer'], $_POST['action'])) {
     $answer = filter_input(INPUT_POST, 'answer', FILTER_SANITIZE_STRING);
     $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
-    verify_answer($answer, $action);
+    verify_answer($mysqli, $answer, $action);
 } elseif (isset($_POST['submit'], $_POST['password'], $_POST['password1'], $_POST['action'])) {    
     $password = $_POST['password'];
     $password1 = $_POST['password1'];
     $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
-    reset_password($password, $password1, $action); 
+    reset_password($mysqli, $password, $password1, $action); 
 }
 if (isset($_SESSION['Error'])) {
-    echo $_SESSION['Error'];
+    //echo $_SESSION['Error'];
     unset($_SESSION['Error']);
 }
