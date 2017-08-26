@@ -1,6 +1,7 @@
 $(document).on('click', '#submit', function() { // catch the form's submit event
-    if ($('#username').val().length > 0) {
-        if (checkUsername($('#username').val())) {
+   username = document.getElementById('username');
+   if (username.value.length > 0) {
+        if (checkUsername(username)) {
             // Send data to server through ajax call
             // action is functionality we want to call and outputJSON is our data
             $.ajax({
@@ -23,8 +24,12 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     //$.mobile.hidePageLoadingMsg(); // This will hide ajax spinner
                 },
                 success: function(result) {
-                    var data = JSON.parse(result);
-                    //console.log(responseData); // works. outputs to console success
+                    console.log(result); // works. outputs to console success
+                    try {
+                        var data = JSON.parse(result);
+                    } catch (e) {
+                        alert('Error with JSON response from server');
+                    }
                     if (data.response == "yes") {
                         $("#question_container").html(data.question);
                         $('#Sign-In').hide();
