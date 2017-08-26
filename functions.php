@@ -288,7 +288,7 @@ function registerUserFromCli($username, $password, $password1) {
 		created_at) VALUES (?, ?, ?, ?)")) {
 		date_default_timezone_set('America/Los_Angeles');
 		$created_at = date("Y-m-d H:i:s");
-		$insert_user->bind_param('sss', $username, $email, $temp_pass, $created_at);
+		$insert_user->bind_param('ssss', $username, $email, $temp_pass, $created_at);
 		// Execute the prepared query.
 		if ($insert_user->execute()) {
 		    /* close statement */
@@ -348,9 +348,11 @@ function registerUser($name, $username, $email, $password, $password1) {
 	    if(checkUsernameExists($mysqli, $username) == false) {
 		$temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
 		// Insert the new user into the database
-		if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)")) {
+		$created_at = date("Y-m-d H:i:s");
+		if ($insert_user = $mysqli->prepare("INSERT INTO users (name, username, email,
+		    password, created_at) VALUES (?,?,?,?,?)")) {
 		    date_default_timezone_set('America/Los_Angeles');
-		    $insert_user->bind_param('ssss', $name, $username, $email, $temp_pass);
+		    $insert_user->bind_param('sssss', $name, $username, $email, $temp_pass, $created_at);
 		    // Execute the prepared query.
 		    if ($insert_user->execute()) {
 			/* close statement */
@@ -393,14 +395,14 @@ function helpUpdatePassword($mysqli, $user_id, $new_password){
     if ($stmt->execute()) {
 	$stmt->close();
 	return true;
-    }else {
+    } else {
 	$message = "Update Password failure: Update Password INSERT";
     }
     $_SESSION['Error'] = $message;
     return false;
 }
 
-function validatePassword($mysqli, $new_password, $new_password1){
+function validatePassword($new_password, $new_password1){
 
     if(strcmp($new_password, $new_password1) == 0 ) {
 	if( (strlen($new_password) <= 64) && (strlen($new_password) >= 8)) {
@@ -435,10 +437,10 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
 	} elseif(is_null($new_password1)) {
 	    $message = "New password is null";
 	} else {
+	    $user_id = getUserID($mysqli, $username);
 	    //Does the old password match
-	    if (login($username,$old_password,$mysqli)) {
-		if(validatePassword($mysqli, $new_password, $new_password1)){
-	//TO DO - Sunjay update user_id
+	    if (login($user_id, $old_password,$mysqli)) {
+		if(validatePassword($new_password, $new_password1)){
 		    return helpUpdatePassword($mysqli, $user_id, $new_password);
 		}
 	    } else {
@@ -577,9 +579,12 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
     //purify answer
     //$answer = $purifier->purify($answer);
     if(strlen($answer) > 5 && strlen($answer) < 64) {
+	date_default_timezone_set('America/Los_Angeles');
+	$created_at = date("Y-m-d H:i:s");
 	$temp_pass = password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9));
-	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id, answer) VALUES (?, ?,?)")) {
-	    $insert_question->bind_param('iis', $user_id, $question_id, $temp_pass);
+	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id,
+	    answer, created_at) VALUES (?, ?, ?, ?)")) {
+	    $insert_question->bind_param('iiss', $user_id, $question_id, $temp_pass, $created_at);
 	    // Execute the prepared query.
 	    if ($insert_question->execute()) {
 		$insert_question->close();
@@ -606,9 +611,11 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
  */
 function insertIntoLoginAttempts($mysqli, $user_id){
 
+    date_default_timezone_set('America/Los_Angeles');
+    $created_at = date("Y-m-d H:i:s");
     $_SESSION['Error']="Username and password combination is incorrect.";
-    if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id) VALUES (?)")) {
-	$insert_st->bind_param('i', $user_id);
+    if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id, created_at) VALUES (?, ?)")) {
+	$insert_st->bind_param('is', $user_id, $created_at);
 	// Execute the prepared query.
 	if ($insert_st->execute()) {
 	    $insert_st->close();
@@ -637,7 +644,7 @@ function verifyPassword($mysqli, $user_id, $password){
 	/* bind result variables */
 	$stmt->bind_result($hash);
 	$output = $stmt->fetch();
-	// TO DO look more into when close should be called on the statement
+	// TO DO - Sunjay look more into when close should be called on the statement
 	if($output) {
 	    $stmt->close();
 	    // TO DO - Sunjay, check if this is still needed
@@ -665,8 +672,7 @@ function verifyPassword($mysqli, $user_id, $password){
 /**
  * Used to autheticate user when logging in
  */
-function login($username, $password,$mysqli) {
-    $user_id = getUserID($mysqli, $username);
+function login($user_id, $password, $mysqli) {
     if ($user_id != 0){
 	//Have there been more than 3 failed login attempts?
 	if(check_brute($user_id, $mysqli) == false){
