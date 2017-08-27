@@ -53,6 +53,11 @@ function checkUsername(username) {
 function checkPassword(password, conf) {
 
     // Check that the password IS the same as the confirmation password
+    console.log(password);
+    console.log(password.value);
+    console.log(password.value.length);
+    console.log(password.length);
+
     if (password.value.localeCompare(conf.value) != 0) {
         alert("Error: Password and Password Confirmation do not match.");
         document.getElementById("password").focus();
