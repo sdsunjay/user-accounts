@@ -1,10 +1,6 @@
 function verifyPassword(password, password1) {
-        if (checkPassword(password) && checkPassword(password1)) {
-                if (password.localeCompare(password1) == 0) {
-                    return true;
-                } else {
-                    message = "Passwords do not match.";
-                }
+    if (checkPassword(password, password1))
+	return true;
     return false;
 }
 var message;

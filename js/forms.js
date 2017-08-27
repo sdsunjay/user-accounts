@@ -53,12 +53,7 @@ function checkUsername(username) {
 function checkPassword(password, conf) {
 
     // Check that the password IS the same as the confirmation password
-    console.log(password);
-    console.log(password.value);
-    console.log(password.value.length);
-    console.log(password.length);
-
-    if (password.value.localeCompare(conf.value) != 0) {
+    if (password.value !== conf.value) {
         alert("Error: Password and Password Confirmation do not match.");
         document.getElementById("password").focus();
         return false;
@@ -103,6 +98,7 @@ function checkPassword(password, conf) {
         document.getElementById("password").focus();
         return false;
     }
+    console.log('Password: true');
     return true;
 }
 
@@ -133,10 +129,10 @@ function checkAnswer(answer1) {
 
 function regformhash(name, username, email, password, conf, answer1) {
     // Check each field has a value
-    if (username.value == '' ||
-        email.value == '' ||
-        password.value == '' ||
-        conf.value == '') {
+    if (username.value === '' ||
+        email.value === '' ||
+        password.value === '' ||
+        conf.value === '') {
 
         alert('You must provide all the requested details. Please try again');
     } else if (checkUsername(username)) {
@@ -145,7 +141,7 @@ function regformhash(name, username, email, password, conf, answer1) {
 		if (checkEmail(email)) {
 
 		    // Check the name
-		    if (name.value != '') {
+		    if (name.value !== '') {
 			if ((/^[a-zA-Z]+$/.test(name.value) == false) || (/^[A-Za-z\s]+$/.test(name.value) == false)) {
 			    alert("Name must contain only letters and spaces. Please try again");
 			    document.getElementById("name").focus();
@@ -154,7 +150,7 @@ function regformhash(name, username, email, password, conf, answer1) {
 		    }
 
 		    // Check that the password is not the same as the username
-		    if (password.value.localeCompare(username.value) == 0) {
+		    if (password.value !== username.value) {
 			alert("Error: Password must be different from Username!");
 			document.getElementById("password").focus();
 			return false;

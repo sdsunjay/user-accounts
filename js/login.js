@@ -1,6 +1,6 @@
 $(document).on('click', '#submit', function() { // catch the form's submit event
     if (checkUsername(username)) {
-        if (checkPassword(password)) {
+        if (checkPassword(password, password)) {
             // Send data to server through ajax call
             // action is functionality we want to call and outputJSON is our data
             $.ajax({
@@ -16,7 +16,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                 .done(function(responseData) {
                     var parsed_data = JSON.parse(responseData);
                     //console.log(responseData); // works. outputs to console success
-                    if (parsed_data.response == "yes") {
+                    if (parsed_data.response === "yes") {
                         window.location = "protected_page.php";
                     } else {
                         alert(parsed_data.response);
