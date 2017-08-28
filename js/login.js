@@ -18,10 +18,16 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     //console.log(responseData); // works. outputs to console success
                     if (parsed_data.response === "yes") {
                         window.location = "protected_page.php";
+                    } else if (parsed_data.response === "no") {
+                        alert(parsed_data.msg);
+                        document.getElementById("password").focus();
                     } else {
-                        alert(parsed_data.response);
+                        alert('An unknown error has occurred. Please try again.');
                     }
-                });
+                  })
+                  .fail(function(responseData) {
+                     alert('A network error has occurred. Please try again.');
+                  });
             // This callback function will trigger on unsuccessful action
         }
     }
