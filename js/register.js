@@ -3,7 +3,8 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
 	    document.getElementById("email"), document.getElementById("password"),
 	    document.getElementById("password1"), document.getElementById("answer1"))) {
             if (validateQuestion($('#question1').val())) {
-                $.ajax({
+               alert('inside'); 
+               $.ajax({
                         method: "POST",
                         url: "register.php",
                         type: 'POST',
@@ -20,7 +21,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     })
                     .done(function(responseData) {
                         var parsed_data = JSON.parse(responseData);
-                        //console.log(responseData); // works. outputs to console success
+                        console.log(responseData); // works. outputs to console success
                         if (parsed_data.response === "yes") {
                             window.location = "protected_page.php";
                         } else {
