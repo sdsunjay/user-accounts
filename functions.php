@@ -59,9 +59,10 @@ function check_brute($user_id, $mysql) {
             //the below line causes the page not to work, not sure why..
             $stmt->close();
             return true;
+	    $_SESSION['Error'] = 'There have been more than 3 failed login attempts. Please wait 1
+		hour before trying again';
          } else {
             $stmt->close();
-            return false;
          }
       } else {
          return false;
@@ -395,9 +396,8 @@ function helpUpdatePassword($mysqli, $user_id, $new_password){
     if ($stmt->execute()) {
 	$stmt->close();
 	return true;
-    } else {
-	$message = "Update Password failure: Update Password INSERT";
-    }
+    } 
+    $message = "Update Password failure: Update Password INSERT";
     $_SESSION['Error'] = $message;
     return false;
 }
@@ -658,6 +658,7 @@ function verifyPassword($mysqli, $user_id, $password){
 		/* Valid */
 		return true;
 	    } else {
+		$_SESSION['Error']="Username and password combination is incorrect";
 		insertIntoLoginAttempts($mysqli, $user_id);
 	    }
 	} else {

@@ -44,9 +44,8 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
 		}
 	    }
 	    $mysqli->close();
-	} else {
-	    $msg =  $_SESSION['Error'];
 	}
+	$msg =  $_SESSION['Error'];
     }
     $arr = array ('response'=> $response, 'msg' => $msg);
     echo json_encode($arr);
