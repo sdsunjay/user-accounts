@@ -27,7 +27,7 @@ function checkEmail(email) {
 
 function checkUsername(username) {
     // Check the username
-   console.log(username);
+   console.log(username.value);
    re = /^\w+$/;
     if (!re.test(username.value)) {
         alert("Username must contain only letters, numbers and underscores. Please try again");
@@ -150,7 +150,7 @@ function regformhash(name, username, email, password, conf, answer1) {
 		    }
 
 		    // Check that the password is not the same as the username
-		    if (password.value !== username.value) {
+		    if (password.value === username.value) {
 			alert("Error: Password must be different from Username!");
 			document.getElementById("password").focus();
 			return false;

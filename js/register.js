@@ -46,8 +46,11 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
 function validateQuestion(n) {
     if (n === "1" || n === "2" || n === "3" || n === "4" || n === "5" || n === "6")
         return true;
-    else
+    else {
+        alert('Select a valid security question');
+        document.getElementById("question1").focus();
         return false;
+    }
 }
 
 function hasWhiteSpace(s) {

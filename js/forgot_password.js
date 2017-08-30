@@ -32,7 +32,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     }
                     if (data.response == "yes") {
                         $("#question_container").html(data.question);
-                        $('#Sign-In').hide();
+                      //  $('#Sign-In').hide();
                         $('#shell #contact #Secret-Question #question_container').html(data.question);
                         $('#Secret-Question').show();
                         //alert(data.question);
@@ -49,8 +49,9 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                 }
             });
         }
-    } else if ($('#answer').val().length > 0) {
-        if (checkAnswer($('#answer'))) {
+    } else if (document.getElementById('answer').value.length > 0){
+        answer = document.getElementById('answer')
+        if (checkAnswer(answer)) {
             // Send data to server through ajax call
             // action is functionality we want to call and outputJSON is our data
             $.ajax({
@@ -58,7 +59,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     url: 'forgot_password.php',
                     data: {
                         action: 'checkAnswer',
-                        answer: $("#answer").val(),
+                        answer: answer.value,
                         submit: true
                     }, //send secret answer and submit to checkAnswer.php
                 })
