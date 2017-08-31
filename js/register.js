@@ -2,8 +2,9 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
     if (regformhash(document.getElementById("name"), document.getElementById("username"),
 	    document.getElementById("email"), document.getElementById("password"),
 	    document.getElementById("password1"), document.getElementById("answer1"))) {
+            alert('inside regformhash'); 
             if (validateQuestion($('#question1').val())) {
-               alert('inside'); 
+               alert('inside question'); 
                $.ajax({
                         method: "POST",
                         url: "register.php",
@@ -43,17 +44,3 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
    function validateEmail(email) {
    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;  return re.test(email);
    }*/
-
-function validateQuestion(n) {
-    if (n === "1" || n === "2" || n === "3" || n === "4" || n === "5" || n === "6")
-        return true;
-    else {
-        alert('Select a valid security question');
-        document.getElementById("question1").focus();
-        return false;
-    }
-}
-
-function hasWhiteSpace(s) {
-    return /\s/g.test(s);
-}

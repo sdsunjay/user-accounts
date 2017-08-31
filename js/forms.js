@@ -1,3 +1,18 @@
+
+function validateQuestion(n) {
+    if (n === "1" || n === "2" || n === "3" || n === "4" || n === "5" || n === "6")
+        return true;
+    else {
+        alert('Select a valid security question');
+        document.getElementById("question1").focus();
+        return false;
+    }
+}
+
+function hasWhiteSpace(s) {
+    return /\s/g.test(s);
+}
+
 function formhash(form, password) {
     // Create a new element input, this will be our hashed password field.
     var p = document.createElement("input");
@@ -22,7 +37,13 @@ function testPassword(str) {
 
 function checkEmail(email) {
     var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return re.test(email);
+    if (!re.test(email.value)){
+      alert("email is not valid");
+      document.getElementById("email").focus();
+      return false;
+    }
+    return true;
+
 }
 
 function checkUsername(username) {
@@ -124,44 +145,52 @@ function checkAnswer(answer1) {
         document.getelementbyid("answer1").focus();
         return false;
     }
+    console.log('Answer: true');
     return true;
 }
 
+function checkName(name){
+
+   re = /^[a-zA-Z\s]*$/; 
+   if (!re.test(name.value)) {
+      alert("Name must contain only letters and spaces. Please try again");
+      document.getElementById("name").focus();
+      return false;
+   }
+   return true;
+}
+
 function regformhash(name, username, email, password, conf, answer1) {
-    // Check each field has a value
-    if (username.value === '' ||
-        email.value === '' ||
-        password.value === '' ||
-        conf.value === '') {
+   // Check each field has a value
+   if (username.value === '' ||
+       email.value === '' ||
+          password.value === '' ||
+             conf.value === '') {
 
-        alert('You must provide all the requested details. Please try again');
-    } else if (checkUsername(username)) {
-	if (checkPassword(password, conf)) {
-	    if (checkAnswer(answer1)) {
-		if (checkEmail(email)) {
+      alert('You must provide all the requested details. Please try again');
+   } else if (checkUsername(username)) {
+      if (checkPassword(password, conf)) {
+         if (checkAnswer(answer1)) {
+            if (checkEmail(email)) {
+               if (checkName(name)) {
 
-		    // Check the name
-		    if (name.value !== '') {
-			if ((/^[a-zA-Z]+$/.test(name.value) == false) || (/^[A-Za-z\s]+$/.test(name.value) == false)) {
-			    alert("Name must contain only letters and spaces. Please try again");
-			    document.getElementById("name").focus();
-			    return false;
-			}
-		    }
+                  // Check that the password is not the same as the username
+                  if (password.value === username.value) {
+                     alert("Error: Password must be different from Username!");
+                     document.getElementById("password").focus();
+                     return false;
 
-		    // Check that the password is not the same as the username
-		    if (password.value === username.value) {
-			alert("Error: Password must be different from Username!");
-			document.getElementById("password").focus();
-			return false;
-		    }
+                  }
 
-		    // Finally submit the form.
-		    //  form.submit();
-		    return true;
-		}
-	    }
-	}
-    }
-    return false;
+                  // Finally submit the form.
+                  //  form.submit();
+                  return true;
+               }
+            }
+         }
+      }
+   } else {
+      alert('Please enter  a value for all required fields');
+   }
+   return false;
 }

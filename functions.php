@@ -296,7 +296,7 @@ function registerUserFromCli($username, $password, $password1) {
 		    mysqli_stmt_close($insert_user);
 		    $_SESSION['user_name'] = $username;
 		    $_SESSION['user_is_logged_in'] = true;
-		    $_SESSION['user_id'] = getUserID($username);
+		    $_SESSION['user_id'] = getUserID($mysqli, $username);
 		    /* close connection */
 		    mysqli_close($mysqli);
 		    return true;
@@ -649,7 +649,7 @@ function verifyPassword($mysqli, $user_id, $password){
 	    $stmt->close();
 	    // TO DO - Sunjay, check if this is still needed
 	    //must remove last character, I have no idea why?
-	    //$hash = substr($hash, 0, -1);
+	    $hash = substr($hash, 0, -1);
 	    $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
 	    if (password_verify($temp_pass, $hash)) {
 		$_SESSION['user_id'] = $user_id;
