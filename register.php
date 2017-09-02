@@ -18,24 +18,20 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'], $_POST['passw
    $question1 = $_POST['question1'];
 
    if(registerUser($name, $username,$email,$password,$password1)) {
-      if(insertQuestionsAnswers($question1,$answer1,$username)) {
-         // Login success 
-         $_SESSION['user_name'] = $username;
-         $_SESSION['user_is_logged_in'] = true;         
-         sec_session_start();
-         
-         $arr = array ('response'=>'yes');
-         echo json_encode($arr);
-      }
-      else{
-         $arr = array ('response'=>$_SESSION['Error']);
-         echo json_encode($arr);
-      }
-   }
-   else {
-      $arr = array ('response'=>$_SESSION['Error']);
-      echo json_encode($arr);
-   }
+       if(insertQuestionsAnswers($question1, $answer1, $_SESSION['user_id'])) {
+	   // Login success 
+	   $_SESSION['user_name'] = $username;
+	   $_SESSION['user_is_logged_in'] = true;         
+	   sec_session_start();
+
+	   $arr = array ('response'=>'yes', 'msg' => 'success');
+	   echo json_encode($arr);
+	   return true;
+       }
+   } 
+   $arr = array ('response'=>'no', 'msg' => $_SESSION['Error']);
+   echo json_encode($arr);
+   return false;
 }
 
 ?>
