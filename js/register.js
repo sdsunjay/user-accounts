@@ -2,9 +2,7 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
     if (regformhash(document.getElementById("name"), document.getElementById("username"),
 	    document.getElementById("email"), document.getElementById("password"),
 	    document.getElementById("password1"), document.getElementById("answer1"))) {
-            alert('inside regformhash'); 
             if (validateQuestion($('#question1').val())) {
-               alert('inside question'); 
                $.ajax({
                         method: "POST",
                         url: "register.php",
@@ -25,8 +23,8 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                         console.log(responseData); // works. outputs to console success
                         if (parsed_data.response === "yes") {
                             window.location = "protected_page.php";
-                        } else {
-                            alert(parsed_data.response);
+                        } else if (parsed_data.response === "no") {
+                            alert(parsed_data.msg);
                         }
                     })
                     .fail(function(responseData) {
@@ -38,9 +36,3 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
     }
     return false; // cancel original event to prevent form submitting
 });
-
-//check if email address is valid
-/*
-   function validateEmail(email) {
-   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;  return re.test(email);
-   }*/
