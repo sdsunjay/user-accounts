@@ -360,7 +360,7 @@ function registerUser($name, $username, $email, $password, $password1) {
 			mysqli_stmt_close($insert_user);
 			$_SESSION['user_name'] = $username;
 			$_SESSION['user_is_logged_in'] = true;
-			$_SESSION['user_id'] = getUserID($username);
+			$_SESSION['user_id'] = getUserID($mysqli, $username);
 			/* close connection */ mysqli_close($mysqli);
 			//  $mysqli->close();
 			return true;
@@ -484,37 +484,31 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
 /*
  * For a given user, get their security question
  */
-function getQuestion($mysqli, $username){
-    $user_id = getUserID($mysqli, $username);
-
-    if($user_id != 0){
-	$question_id = getQuestionID($mysqli,$user_id);
-	if($question_id != 0){
-	    $query = "select question from questions where id = ?";
-	    $chk_name= $mysqli->prepare($query);
-	    $chk_name->bind_param('i',$question_id);
-	    // Execute the prepared query.
-	    if ($chk_name->execute()) {
-		//bind result variables
-		$chk_name->bind_result($question);
-		$output = $chk_name->fetch();
-		if($output){
-		    setcookie("username",$username);
-		    $_SESSION['username'] = $username;
-		    $_SESSION['question_id'] = $question_id;
-		    $_SESSION['user_id'] = $user_id;
-		    $chk_name->close();
-		    return $question;
-		}
-		$_SESSION['Error'] = 'Unable to find question for '.$username;
+function getQuestion($mysqli, $user_id){
+    $question_id = getQuestionID($mysqli,$user_id);
+    if($question_id != 0){
+	$query = "select question from questions where id = ?";
+	$chk_name= $mysqli->prepare($query);
+	$chk_name->bind_param('i', $question_id);
+	// Execute the prepared query.
+	if ($chk_name->execute()) {
+	    //bind result variables
+	    $chk_name->bind_result($question);
+	    $output = $chk_name->fetch();
+	    if($output){
+		setcookie("username",$username);
+		$_SESSION['username'] = $username;
+		$_SESSION['question_id'] = $question_id;
+		$_SESSION['user_id'] = $user_id;
 		$chk_name->close();
-	    } else {
-		$_SESSION['Error'] = 'Unable to find question for '.$username;
-		return false;
+		return $question;
 	    }
+	    $_SESSION['Error'] = 'Unable to find question for '.$username;
+	    $chk_name->close();
+	} else {
+	    $_SESSION['Error'] = 'Unable to find question for '.$username;
+	    return false;
 	}
-	$_SESSION['Error'] = 'Unable to find question for '.$username;
-	return false;
     }
     return false;
 }
@@ -549,9 +543,8 @@ function getQuestionID($mysqli,$user_id){
 /**
  * Insert user's security question and answer into user_answers
  */
-function insertQuestionsAnswers($mysqli, $question_id, $answer1, $username) {
+function insertQuestionsAnswers($mysqli, $question_id, $answer1, $user_id) {
 
-    $user_id = getUserID($mysqli,$username);
     if($user_id > 0){
 	//two questions and two answers
 	if(insertQuestion($mysqli, $user_id, $question_id, $answer1)) {
@@ -566,7 +559,6 @@ function insertQuestionsAnswers($mysqli, $question_id, $answer1, $username) {
 	$feedback = "Username could not be found";
 	$_SESSION['Error'] = $feedback;
     }
-    $mysqli->close();
     return false;
 }
 
@@ -584,20 +576,20 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
 	$temp_pass = password_hash($answer, PASSWORD_BCRYPT,array("cost" => 9));
 	if ($insert_question = $mysqli->prepare("INSERT INTO user_answers (user_id, question_id,
 	    answer, created_at) VALUES (?, ?, ?, ?)")) {
-	    $insert_question->bind_param('iiss', $user_id, $question_id, $temp_pass, $created_at);
-	    // Execute the prepared query.
-	    if ($insert_question->execute()) {
-		$insert_question->close();
-		return true;
-	    } else {
-		$feedback = "Registration failure: Security Question INSERT";
-		$_SESSION['Error'] = $feedback;
-		$insert_user->close();
-	    }
+		$insert_question->bind_param('iiss', $user_id, $question_id, $temp_pass, $created_at);
+	// Execute the prepared query.
+	if ($insert_question->execute()) {
+	    $insert_question->close();
+	    return true;
 	} else {
-	    $feedback = "Database Error";
+	    $feedback = "Registration failure: Security Question INSERT";
 	    $_SESSION['Error'] = $feedback;
+	    $insert_user->close();
 	}
+    } else {
+	$feedback = "Database Error";
+	$_SESSION['Error'] = $feedback;
+    }
     } else {
 	$feedback = "Security question answer is not long enough or is too long";
 	$_SESSION['Error'] = $feedback;
