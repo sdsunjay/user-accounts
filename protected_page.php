@@ -92,8 +92,8 @@
 <?php
 include_once("../../config/db_config.php");
 include_once("../accounts/functions.php");
-# sec_session_start(); // Our custom secure way of starting a PHP session.
-function user_role($mysqli,$username)
+sec_session_start($_SESSION['user_name']); // Our custom secure way of starting a PHP session.
+function user_role($mysqli, $username)
 {
 
    $chk_name= $mysqli->prepare("SELECT id FROM users WHERE username = ?");

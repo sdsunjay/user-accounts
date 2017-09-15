@@ -1,5 +1,6 @@
 $(document).on('click', '#submit', function() { // catch the form's submit event
-    if ($('#username').val().length > 0) {
+   username = document.getElementById('username');
+   if (username.value.length > 0) {
         if (checkUsername(username)) {
             // Send data to server through ajax call
             // action is functionality we want to call and outputJSON is our data
@@ -23,16 +24,18 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                     //$.mobile.hidePageLoadingMsg(); // This will hide ajax spinner
                 },
                 success: function(result) {
-
-                    var data = JSON.parse(result);
-                    //console.log(responseData); // works. outputs to console success
+                    console.log(result); // works. outputs to console success
+                    try {
+                        var data = JSON.parse(result);
+                    } catch (e) {
+                        alert('Error with JSON response from server');
+                    }
                     if (data.response == "yes") {
-                       $("#question_container").html(data.question); 
-                        $('#Sign-In').hide();
+                        $("#question_container").html(data.question);
+                      //  $('#Sign-In').hide();
                         $('#shell #contact #Secret-Question #question_container').html(data.question);
                         $('#Secret-Question').show();
                         //alert(data.question);
-                        //window.location = "protected_page.php";
                     } else if (data.response === "no") {
                         alert(data.msg);
                         //alert('Username does not exist');
@@ -46,27 +49,55 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                 }
             });
         }
-    } else if ($('#answer').val().length > 0) {
-        // Send data to server through ajax call
-        // action is functionality we want to call and outputJSON is our data
-        $.ajax({
-                type: 'POST',
-                url: 'forgot_password.php',
-                data: {
-                    action: 'checkAnswer',
-                    answer: $("#answer").val(),
-                    submit: true
-                }, //send secret answer and submit to checkAnswer.php
-            })
-            .done(function(responseData) {
-                var parsed_data = JSON.parse(responseData);
-                //console.log(responseData); // works. outputs to console success
-                if (parsed_data.response == "yes") {
-                    window.location = "protected_page.php";
-                } else {
-                    alert(parsed_data.response);
-                }
-            });
+    } else if (document.getElementById('answer').value.length > 0){
+        answer = document.getElementById('answer')
+        if (checkAnswer(answer)) {
+            // Send data to server through ajax call
+            // action is functionality we want to call and outputJSON is our data
+            $.ajax({
+                    type: 'POST',
+                    url: 'forgot_password.php',
+                    data: {
+                        action: 'checkAnswer',
+                        answer: answer.value,
+                        submit: true
+                    }, //send secret answer and submit to checkAnswer.php
+                })
+                .done(function(responseData) {
+                    var parsed_data = JSON.parse(responseData);
+                    //console.log(responseData); // works. outputs to console success
+                    if (parsed_data.response == "yes") {
+                        $('#Secret-Question').hide();
+                        $('#Password').show();
+                    } else {
+                        alert(parsed_data.response);
+                    }
+                });
+        }
+    } else if ($('#password').val().length > 0) {
+        if (checkPassword($('#password'), $('#password1'))) {
+            // Send data to server through ajax call
+            // action is functionality we want to call and outputJSON is our data
+            $.ajax({
+                    type: 'POST',
+                    url: 'forgot_password.php',
+                    data: {
+                        action: 'checkPassword',
+                        password: $("#password").val(),
+                        password1: $("#password1").val(),
+                        submit: true
+                    }, //send secret answer and submit to checkAnswer.php
+                })
+                .done(function(responseData) {
+                    var parsed_data = JSON.parse(responseData);
+                    //console.log(responseData); // works. outputs to console success
+                    if (parsed_data.response == "yes") {
+                        window.location = "protected_page.php";
+                    } else {
+                        alert(parsed_data.response);
+                    }
+                });
+        }
     }
     return false; // cancel original event to prevent form submitting
 });
