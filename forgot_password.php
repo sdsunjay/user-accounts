@@ -18,8 +18,9 @@ function verify_answer($mysqli, $answer, $action){
 
 function verify_username($mysqli, $username, $action){
     if ($action == 'checkUsername') {
-        if (checkUsernameExists($mysqli, $username)) {
-            $questionForUser = getQuestion($mysqli, $username);
+        $user_id = getUserID($mysqli, $username;
+        if ($user_id !== 0){
+	    $questionForUser = getQuestion($mysqli, $user_id);
             $arr = array('response' => 'yes', 'question'=>$questionForUser);
             echo json_encode($arr);
         } else {
