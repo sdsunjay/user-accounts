@@ -151,7 +151,7 @@ function checkAnswer(answer1) {
 
 function checkName(name){
 
-   re = /^[a-zA-Z\s]*$/; 
+   var re = /^[a-zA-Z\s]*$/;
    if (!re.test(name.value)) {
       alert("Name must contain only letters and spaces. Please try again");
       document.getElementById("name").focus();
