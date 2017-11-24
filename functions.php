@@ -1,13 +1,12 @@
 <?php
-//sec_session_start();
 /*
  * XSS Protective Measures
  */
 require_once '/usr/share/nginx/html/security/htmlpurifier-4.9.3-standalone/HTMLPurifier.standalone.php';
 
 
-function Redirect($url, $permanent = false){
-   header('Location: ' . $url, true, $permanent ? 301 : 302);
+function Redirect($url, $permanent = False){
+   header('Location: ' . $url, True, $permanent ? 301 : 302);
    exit();
 }
 
@@ -58,62 +57,66 @@ function check_brute($user_id, $mysql) {
          if ($stmt->num_rows > 3) {
             //the below line causes the page not to work, not sure why..
             $stmt->close();
-            return true;
-	    $_SESSION['Error'] = 'There have been more than 3 failed login attempts. Please wait 1
-		hour before trying again';
+	    $_SESSION['Error'] = 'There have been more than 3 failed login attempts. Please wait 1 hour before trying again';
+            return True;
          } else {
             $stmt->close();
          }
       } else {
-         return false;
+         return False;
       }
    }
-   return false;
+   return False;
 }
 
 function login_check($mysqli) {
     // Check if all session variables are set
-    if (isset($_SESSION['user_name'], $_SESSION['user_is_logged_in'])) {
-	if ($_SESSION['user_is_logged_in']) {
-	    $username = $_SESSION['user_name'];
-	    // Get the user-agent string of the user.
-	    $user_browser = $_SERVER['HTTP_USER_AGENT'];
-	    //if(checkUsernameExists($mysqli, $username)){
-	    return true;
-	  //  }
-	}
+   if (isset($_SESSION['user_is_logged_in'])) {
+      //$username = $_SESSION['username'];
+      // Get the user-agent string of the user.
+      $user_browser = $_SERVER['HTTP_USER_AGENT'];
+      //if(checkUsernameExists($mysqli, $username)){
+      return True;
     }
-    return false;
+    return False;
 }
 
 function sec_session_start($session_name) {
-    // $secure = false;
-    $secure = true;
+   if($session_name){
+   // $secure = False;
+    $secure = True;
     // This stops JavaScript being able to access the session id.
-    $httpsonly = true;
+    $httpsonly = True;
     // Forces sessions to only use cookies.
     if (ini_set('session.use_only_cookies', 1) === FALSE) {
 	header("Location: ./error.php?err=Could not initiate a safe session (ini_set)");
 	exit();
     }
+    // Sets the session name to the one set above.
+    session_name($session_name);
+    session_start();            // Start the PHP session
     // Gets current cookies params.
-    $cookieParams = session_get_cookie_params();
+    /*$cookieParams = session_get_cookie_params();
     session_set_cookie_params($cookieParams["lifetime"],
 	    $cookieParams["path"],
 	    $cookieParams["domain"],
 	    $secure,
-	    $httpsonly);
-    // Sets the session name to the one set above.
-    session_name($session_name);
-    session_start();            // Start the PHP session
+            $httpsonly);*/
     //session_regenerate_id();    // regenerated the session, delete the old one.
-    //$_SESSION['user_is_logged_in'] = false;
+    $_SESSION["username"] = $session_name;
+    setcookie("username", $session_name, time() + (86400 * 30));
+   // "/", 'sunjaydhama.com/projects/accounts', $secure, $httpsonly); // 86400 = 1 day
+    return True;
+   }
+   else{
+      return False;
+   }
 }
 
 function logout() {
     $_SESSION = array();
     session_destroy();
-    $user_is_logged_in = false;
+    $user_is_logged_in = False;
     $feedback = "You were just logged out.";
 }
 
@@ -137,8 +140,8 @@ function checkRegistrationData($username, $pass, $pass1) {
 	    && (strlen($pass) <= 64)
 	    && ( strlen($pass1) <= 64)
        ) {
-	        // only this case return true, only this case is valid
-	         return true;
+	        // only this case return True, only this case is valid
+	         return True;
     }
     elseif (empty($username)) {
 	$feedback = "Empty Username";
@@ -171,7 +174,7 @@ function checkRegistrationData($username, $pass, $pass1) {
     }
     $_SESSION['Error']=$feedback;
     // default return
-    return false;
+    return False;
 }
 
 
@@ -190,23 +193,23 @@ function checkEmailExists($mysqli, $email) {
 		$_SESSION['Error']=$feedback;
 		/* close statement */
 		mysqli_stmt_close($stmt);
-		return true;
+		return True;
 	    }
 	    /* close statement */
 	    mysqli_stmt_close($stmt);
-	    return false;
+	    return False;
 	}
 	$feedback = "Problem executing query";
 	$_SESSION['Error']=$feedback;
 	/* close statement */
 	mysqli_stmt_close($stmt);
-	return true;
+	return True;
     }
     $feedback = "A problem occurred with this email";
     $_SESSION['Error']=$feedback;
     /* close statement */
     mysqli_stmt_close($stmt);
-    return false;
+    return False;
 }
 /*
  * Get the user ID from the Users table
@@ -255,9 +258,9 @@ function getUserID($mysqli, $username){
 function checkUsernameExists($mysqli, $username) {
    $user_id = getUserID($mysqli, $username);
    if ($user_id != 0) {
-      return true;
+      return True;
    } else {
-      return false;
+      return False;
    }
 }
 
@@ -272,15 +275,15 @@ function registerUserFromCli($username, $password, $password1) {
       if (mysqli_connect_errno()) {
          $feedback = "Connect failed";
          $_SESSION['Error'] = $feedback;
-         return false;
+         return False;
       }
 
       // Username validity and password validity have NOT been checked client side.
       // This should be adequate as nobody gains any advantage from
       // breaking these rules.
-      if(checkUsernameExists($mysqli, $username) == false) {
+      if(checkUsernameExists($mysqli, $username) == False) {
          //create a random salt
-         //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+         //$random_salt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), True));
          //$salt = substr($random_salt, 0, 128);
          $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
          // Insert the new user into the database
@@ -293,19 +296,19 @@ function registerUserFromCli($username, $password, $password1) {
                if ($insert_user->execute()) {
                   /* close statement */
                   mysqli_stmt_close($insert_user);
-                  $_SESSION['user_name'] = $username;
-                  $_SESSION['user_is_logged_in'] = true;
+                  $_SESSION['username'] = $username;
+                  $_SESSION['user_is_logged_in'] = True;
                   $_SESSION['user_id'] = getUserID($mysqli, $username);
                   /* close connection */
                   mysqli_close($mysqli);
-                  return true;
+                  return True;
                } else {
                   $insert_user->close();
                   $feedback = "Registration failure: INSERT";
                     /* close connection */ mysqli_close($mysqli);
                   //$mysqli->close();
                   $_SESSION['Error'] = $feedback;
-                  return false;
+                  return False;
                }
             } else {
                $insert_user->close();
@@ -313,16 +316,16 @@ function registerUserFromCli($username, $password, $password1) {
                //$mysqli->close();
                 /* close connection */ mysqli_close($mysqli);
                $_SESSION['Error'] = $feedback;
-               return false;
+               return False;
             }
       } else {
          $feedback = "Registration failure: Username already exists";
          $mysqli->close();
          //$_SESSION['Error'] = $feedback;
-         return false;
+         return False;
       }
    }
-   return false;
+   return False;
 }
 
 function registerUser($mysqli, $name, $username, $email, $password, $password1) {
@@ -334,8 +337,8 @@ function registerUser($mysqli, $name, $username, $email, $password, $password1) 
    // Username validity and password validity have been checked client side.
    // This should be adequate as nobody gains any advantage from
    // breaking these rules.
-   if(checkEmailExists($mysqli, $email) == false ) {
-      if(checkUsernameExists($mysqli, $username) == false) {
+   if(checkEmailExists($mysqli, $email) == False ) {
+      if(checkUsernameExists($mysqli, $username) == False) {
          $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
          // Insert the new user into the database
          $created_at = date("Y-m-d H:i:s");
@@ -347,12 +350,17 @@ function registerUser($mysqli, $name, $username, $email, $password, $password1) 
                if ($insert_user->execute()) {
                   /* close statement */
                   mysqli_stmt_close($insert_user);
-                  sec_session_start($username);
-                  $_SESSION['user_name'] = $username;
-                  $_SESSION['user_is_logged_in'] = true;
-                  $user_id = getUserID($mysqli, $username);
-                  $_SESSION['user_id'] = $user_id;
-                  return true;
+                  if(sec_session_start($username)){
+                     $_SESSION['user_is_logged_in'] = True;
+                     $user_id = getUserID($mysqli, $username);
+                     $_SESSION['user_id'] = $user_id;
+                     return True;
+                  }else{
+                     $insert_user->close();
+                     $feedback = "Registration failure: Unable to start session";
+                     $_SESSION['Error'] = $feedback;
+                     $mysqli->close();
+                  }
                         /* close connection */ //mysqli_close($mysqli);
                } else {
                   $insert_user->close();
@@ -372,7 +380,7 @@ function registerUser($mysqli, $name, $username, $email, $password, $password1) 
    } else {
       $mysqli->close();
    }
-   return false;
+   return False;
 }
 function helpUpdatePassword($mysqli, $user_id, $new_password){
 
@@ -384,11 +392,11 @@ function helpUpdatePassword($mysqli, $user_id, $new_password){
    // Execute the prepared query.
    if ($stmt->execute()) {
       $stmt->close();
-      return true;
+      return True;
    } 
    $message = "Update Password failure: Update Password INSERT";
    $_SESSION['Error'] = $message;
-   return false;
+   return False;
 }
 
 function validatePassword($new_password, $new_password1){
@@ -397,7 +405,7 @@ function validatePassword($new_password, $new_password1){
       if( (strlen($new_password) <= 64) && (strlen($new_password) >= 8)) {
          $result = (preg_match('/[A-Z]+/', $new_password) && preg_match('/[a-z]+/', $new_password) && preg_match('/\d/', $new_password));
          if ($result) {
-            return true;
+            return True;
          } else {
             $message = "Password does not contain atleast one lower case letter, one uppercase letter, and one number";
          }
@@ -408,7 +416,7 @@ function validatePassword($new_password, $new_password1){
       $message = "Passwords do not match.";
    }
    $_SESSION['Error'] = $message;
-   return false;
+   return False;
 }
 
 /**
@@ -440,7 +448,7 @@ function updatePassword($mysqli, $username, $old_password, $new_password, $new_p
       $message = "You are not logged in";
    }
    $_SESSION['Error'] = $message;
-   return false;
+   return False;
 }
 
 /**
@@ -461,14 +469,14 @@ function checkAnswer($mysqli, $user_answer, $question_id, $user_id) {
          if (password_verify($temp_answer, $answer)) {
             // TO DO - Sunjay, user should not be logged in, simply because they answered their secret
             // question
-            //	$_SESSION['user_is_logged_in'] = true;
-            return true;
+            //	$_SESSION['user_is_logged_in'] = True;
+            return True;
          } else {
-            return false;
+            return False;
          }
       }
    }
-   return false;
+   return False;
 }
 /*
  * For a given user, get their security question
@@ -485,21 +493,21 @@ function getQuestion($mysqli, $user_id){
          $chk_name->bind_result($question);
          $output = $chk_name->fetch();
          if($output){
-            setcookie("username",$username);
-            $_SESSION['username'] = $username;
-            $_SESSION['question_id'] = $question_id;
-            $_SESSION['user_id'] = $user_id;
-            $chk_name->close();
-            return $question;
+            if(sec_session_start($username)){
+               $_SESSION['question_id'] = $question_id;
+               $_SESSION['user_id'] = $user_id;
+               $chk_name->close();
+               return $question;
+            }
          }
          $_SESSION['Error'] = 'Unable to find question for '.$username;
          $chk_name->close();
       } else {
          $_SESSION['Error'] = 'Unable to find question for '.$username;
-         return false;
+         return False;
       }
    }
-   return false;
+   return False;
 }
 
 /**
@@ -538,7 +546,7 @@ function insertQuestionsAnswers($mysqli, $question_id, $answer1, $user_id) {
       //two questions and two answers
       if(insertQuestion($mysqli, $user_id, $question_id, $answer1)) {
          $mysqli->close();
-         return true;
+         return True;
       } else {
 
          $feedback = "Question 1 could not be added";
@@ -548,7 +556,7 @@ function insertQuestionsAnswers($mysqli, $question_id, $answer1, $user_id) {
       $feedback = "Username could not be found";
       $_SESSION['Error'] = $feedback;
    }
-   return false;
+   return False;
 }
 
 /**
@@ -569,7 +577,7 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
             // Execute the prepared query.
             if ($insert_question->execute()) {
                $insert_question->close();
-               return true;
+               return True;
             } else {
                $feedback = "Registration failure: Security Question INSERT";
                $_SESSION['Error'] = $feedback;
@@ -583,7 +591,7 @@ function insertQuestion($mysqli, $user_id, $question_id, $answer) {
       $feedback = "Security question answer is not long enough or is too long";
       $_SESSION['Error'] = $feedback;
    }
-   return false;
+   return False;
 }
 
 /**
@@ -594,12 +602,12 @@ function insertIntoLoginAttempts($mysqli, $user_id){
 
    date_default_timezone_set('America/Los_Angeles');
    $created_at = date("Y-m-d H:i:s");
-   $_SESSION['Error']="Username and password combination is incorrect.";
    if ($insert_st = $mysqli->prepare("INSERT INTO login_attempts(user_id, created_at) VALUES (?, ?)")) {
       $insert_st->bind_param('is', $user_id, $created_at);
       // Execute the prepared query.
       if ($insert_st->execute()) {
          $insert_st->close();
+         return True;
       } else {
          $message = "Login Attempts failure: INSERT";
          $_SESSION['Error']=$message;
@@ -610,7 +618,7 @@ function insertIntoLoginAttempts($mysqli, $user_id){
       $_SESSION['Error']=$message;
       $insert_st->close();
    }
-
+   return False;
 }
 
 /**
@@ -630,14 +638,11 @@ function verifyPassword($mysqli, $user_id, $password){
          $stmt->close();
          // TO DO - Sunjay, check if this is still needed
          //must remove last character, I have no idea why?
-         $hash = substr($hash, 0, -1);
-         $temp_pass = password_hash($password, PASSWORD_BCRYPT,array("cost" => 9));
+         # $hash = substr($hash, 0, -1);
+         $temp_pass = password_hash($password, PASSWORD_BCRYPT, array("cost" => 9));
          if (password_verify($temp_pass, $hash)) {
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['user_name'] = $username;
-            $_SESSION['user_is_logged_in'] = true;
             /* Valid */
-            return true;
+            return True;
          } else {
             $_SESSION['Error']="Username and password combination is incorrect";
             insertIntoLoginAttempts($mysqli, $user_id);
@@ -648,7 +653,7 @@ function verifyPassword($mysqli, $user_id, $password){
    } else {
       $_SESSION['Error']="Unable to fetch user's password from database.";
    }
-   return false;
+   return False;
 }
 
 /**
@@ -657,12 +662,16 @@ function verifyPassword($mysqli, $user_id, $password){
 function login($user_id, $password, $mysqli) {
    if ($user_id != 0){
       //Have there been more than 3 failed login attempts?
-      if(check_brute($user_id, $mysqli) == false){
-         return verifyPassword($mysqli, $user_id, $password);
+      if(check_brute($user_id, $mysqli) == False){
+         if(verifyPassword($mysqli, $user_id, $password)){
+            return True;
+         } else {
+            return False;
+         }
       } else {
          $_SESSION['Error']="Account is temporarily locked.";
       }
    }
-   return false;
+   return False;
 }
 ?>

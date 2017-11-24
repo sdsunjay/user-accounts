@@ -159,6 +159,17 @@ function checkName(name){
    }
    return true;
 }
+function loginformhash(email, password){
+      if(email.value === '' ||
+          password.value === '') {
+      alert('You must provide all the requested details. Please try again');
+   } else if (checkUsername(username)) {
+      if (checkPassword(password, password)) {
+         return true;
+      }
+   }
+   return false;
+}
 
 function regformhash(name, username, email, password, conf, answer1) {
    // Check each field has a value

@@ -92,7 +92,6 @@
 <?php
 include_once("../../config/db_config.php");
 include_once("../accounts/functions.php");
-sec_session_start($_SESSION['user_name']); // Our custom secure way of starting a PHP session.
 function user_role($mysqli, $username)
 {
 
@@ -131,11 +130,11 @@ function user_role($mysqli, $username)
    }
    if(strcmp($role,"admin") == 0)
    {
-      return true;
+      return True;
    }
    else
    {
-      return false;
+      return False;
    }
 
 }
@@ -161,6 +160,8 @@ function showInfo($mysqli)
 //}
 
 
+sec_session_start($_COOKIE["username"]);
+
 $mysqli = new mysqli(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
 /* check connection */
 if (mysqli_connect_errno()) 
@@ -172,7 +173,7 @@ if (mysqli_connect_errno())
 /*check to make sure we are logged in*/
 if(login_check($mysqli))
 {
-   echo "Welcome " .$_SESSION['user_name']."<br>";
+   echo "Welcome " .$_COOKIE["username"]."<br>";
 ?>
                  <a href="#" id="try-1" class="try sprited">Change Your Password</a>
             <div id="sign_up">
@@ -192,7 +193,7 @@ if(login_check($mysqli))
                   <label><input type="password" id="new_password" name="new_password" size="64" placeholder="New Password" class="sprited" autocomplete="off"/></label>
                   <label><input type="password" id="new_password1" name="new_password1" size="64" placeholder="Confirm Password" class="sprited" autocomplete="off"/></label>
                   <div id="actions">
-                     <a class="close form_button sprited" id="cancel" href="#">Cancel</a>
+                     <!--<a class="close form_button sprited" id="cancel" href="#">Cancel</a>-->
                      <input id="submit" type="submit" name="submit" value="Update" onclick="window.location='./protected_page.php';" />
                </div>
                </div>
@@ -210,13 +211,16 @@ if(login_check($mysqli))
                      <input type="file" name="file" id="file"><br>
                      <input type="submit" name="submit" value="Submit">
                   </form>
-                  <div id="actions">
+                  <!--<div id="actions">
                      <a class="close form_button sprited" id="cancel" href="#">Cancel</a>
                   </div>
+                  -->
          </div>
    </div>
-<?php   
-   if(user_role($mysqli,$_SESSION['user_name']))
+<?php
+
+
+   if(user_role($mysqli, $_SESSION['username']))
    {
       //echo "<h3><a href='../airport/admin.php'>Airport Admin</a></h3>";
       //echo "You are an administrator <br>";i
@@ -228,7 +232,7 @@ if(login_check($mysqli))
    }
    else
    {
-      //echo "You are <b> not </b> an administrator <br>";
+      echo "You are <b> not </b> an administrator <br>";
 
    }
    echo "You are securely logged in. <br>"; 
@@ -240,13 +244,10 @@ else
 
    echo "You are not logged in. <br>";
    echo "If you have an account, please <a href='index.html'>sign in</a>. <br>";
+   echo "If you don't have a login, please <a href='register.html'>Register</a>. <br>";
 }
-//sec_session_start();
 ?>
 <br>
-      <p>If you don't have a login, please <a href="register.html">Register</a>.</p>
-      <p>If you are done, please <a href="logout.php">Log Out</a>.</p>
-      <p><a href="forgot_password.html">Forgot your password</a>.</p>
       </div>
    </div>
 </div>
@@ -271,10 +272,10 @@ else
 <script type="text/javascript" charset="utf-8">
 $(function() {
       function launch() {
-      $('#sign_up').lightbox_me({centered: true, onLoad: function() { $('#sign_up').find('input:first').focus()}});
+      $('#sign_up').lightbox_me({centered: True, onLoad: function() { $('#sign_up').find('input:first').focus()}});
       }
       $('#try-1').click(function(e) {
-         $("#sign_up").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+         $("#sign_up").lightbox_me({centered: True, preventScroll: True, onLoad: function() {
             $("#sign_up").find("input:first").focus();
             }});
          e.preventDefault();
@@ -286,10 +287,10 @@ $(function() {
 <script type="text/javascript" charset="utf-8">
 $(function() {
    function launch() {
-      $('#upload').lightbox_me({centered: true, onLoad: function() { $('#upload').find('input:first').focus()}});
+      $('#upload').lightbox_me({centered: True, onLoad: function() { $('#upload').find('input:first').focus()}});
             }
             $('#upload_button').click(function(e) {
-               $("#upload").lightbox_me({centered: true, preventScroll: true, onLoad: function() {
+               $("#upload").lightbox_me({centered: True, preventScroll: True, onLoad: function() {
                   $("#upload").find("input:first").focus();
                                 }});
                 e.preventDefault();

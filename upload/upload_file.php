@@ -58,7 +58,7 @@ if($_FILES["file"]["name"])
          else
          {
             move_uploaded_file($_FILES["file"]["tmp_name"],
-               "/tmp/uploads/" . $_FILES["file"]["name"]);
+               "/usr/share/nginx/html/projects/accounts/images/user_images/" . $_FILES["file"]["name"]);
             echo "Stored in: " . $_FILES["file"]["name"];
          }
          header("Location: https://sunjaydhama.com/projects/accounts/protected_page.php");

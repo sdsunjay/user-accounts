@@ -1,6 +1,5 @@
 $(document).on('click', '#submit', function() { // catch the form's submit event
-    if (checkUsername(username)) {
-        if (checkPassword(password, password)) {
+    if (loginformhash(username, password)) {
             // Send data to server through ajax call
             // action is functionality we want to call and outputJSON is our data
             $.ajax({
@@ -29,7 +28,11 @@ $(document).on('click', '#submit', function() { // catch the form's submit event
                      alert('A network error has occurred. Please try again.');
                   });
             // This callback function will trigger on unsuccessful action
-        }
+    } else {
+      $(".shell .contact .content-contactform #shadow").fadeIn("normal"); 
+      $(".shell .contact .content-contactform #shadow").val("Login Error");
+      console.log('Login Error');
     }
+
     return false; // cancel original event to prevent form submitting
 });

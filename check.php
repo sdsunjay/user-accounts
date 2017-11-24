@@ -31,11 +31,10 @@ if(isset($_POST['submit'],$_POST['username'], $_POST['password'])) {
 		if($user_id != 0){
 		    if(login($user_id, $password, $mysqli)) {
 			// Login success
-			setcookie("username",$username);
-			$_SESSION['user_is_logged_in'] = true;
-			$session_name = 'sec_session_id';   // Set a custom session name
-			// Sets the session name to the one set above.
-			session_name($session_name);
+                        if(sec_session_start($username)){
+                           $_SESSION['user_id'] = $user_id;
+                           $_SESSION['user_is_logged_in'] = true;
+                        }
 			$response = 'yes';
 			$msg = 'Success';
 		    }
